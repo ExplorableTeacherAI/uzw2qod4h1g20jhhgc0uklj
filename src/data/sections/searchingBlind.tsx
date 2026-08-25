@@ -15,6 +15,16 @@ import { Figure, FigureSlider } from "@/components/molecules";
 import { useSetVar, useVar } from "@/stores";
 import { clamp, remap, useSpring } from "@/lib/motion";
 import {
+    CHECKED_COUNTS,
+    DISTANCES,
+    GRID_COLS,
+    GRID_ROWS,
+    isWall,
+    NURSE,
+    ROBOT,
+    ROUTE_LENGTH,
+} from "./hospitalFloorModel";
+import {
     choicePropsFromDefinition,
     clozePropsFromDefinition,
     getVariableInfo,
@@ -22,51 +32,6 @@ import {
     numberPropsFromDefinition,
 } from "../variables";
 
-// ── The floor plan model (the drawing derives from this, nothing is hand-placed)
-
-const GRID_COLS = 13;
-const GRID_ROWS = 9;
-const START: [number, number] = [2, 4];
-const GOAL: [number, number] = [11, 4];
-
-const WALLS: ReadonlySet<string> = new Set<string>([
-    ...Array.from({ length: 6 }, (_, row) => `6,${row}`),
-    ...Array.from({ length: 6 }, (_, index) => `9,${index + 3}`),
-]);
-
-const isWall = (col: number, row: number) => WALLS.has(`${col},${row}`);
-
-/** Breadth-first distances from the robot: the order a blind search checks squares. */
-const computeDistances = (): number[][] => {
-    const distances = Array.from({ length: GRID_ROWS }, () =>
-        Array.from({ length: GRID_COLS }, () => Number.POSITIVE_INFINITY),
-    );
-    distances[START[1]][START[0]] = 0;
-    const queue: [number, number][] = [START];
-    let head = 0;
-    while (head < queue.length) {
-        const [col, row] = queue[head++];
-        const next = distances[row][col] + 1;
-        for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]] as const) {
-            const nextCol = col + dx;
-            const nextRow = row + dy;
-            if (nextCol < 0 || nextCol >= GRID_COLS || nextRow < 0 || nextRow >= GRID_ROWS) continue;
-            if (isWall(nextCol, nextRow)) continue;
-            if (distances[nextRow][nextCol] <= next) continue;
-            distances[nextRow][nextCol] = next;
-            queue.push([nextCol, nextRow]);
-        }
-    }
-    return distances;
-};
-
-const DISTANCES = computeDistances();
-const GOAL_DISTANCE = DISTANCES[GOAL[1]][GOAL[0]];
-
-/** How many squares the search has checked once it is `step` steps out. */
-const CHECKED_COUNTS: number[] = Array.from({ length: GOAL_DISTANCE + 1 }, (_, step) =>
-    DISTANCES.flat().filter((distance) => distance <= step).length,
-);
 const MAX_COUNT_AXIS = 100;
 const DEFAULT_STEP = 4;
 
@@ -96,7 +61,7 @@ const EASE_150 = { transition: "opacity 150ms ease, stroke-width 150ms ease, fil
 const formatChecked = (count: number) => `${count} squares checked`;
 const formatStep = (step: number) => `${step} steps out`;
 
-const checkedAt = (step: number) => CHECKED_COUNTS[clamp(Math.round(step), 0, GOAL_DISTANCE)];
+const checkedAt = (step: number) => CHECKED_COUNTS[clamp(Math.round(step), 0, ROUTE_LENGTH)];
 
 // ── Shared highlight (the correspondence between the two views) ──────────────
 
@@ -154,7 +119,7 @@ function FloorPlanDrawing() {
         if (col < 0 || col >= GRID_COLS || row < 0 || row >= GRID_ROWS) return;
         const distance = DISTANCES[row][col];
         if (!Number.isFinite(distance)) return;
-        setVar("blindSearchStep", clamp(distance, 0, GOAL_DISTANCE));
+        setVar("blindSearchStep", clamp(distance, 0, ROUTE_LENGTH));
         setVar("blindSearchExplored", true);
     };
 
@@ -174,8 +139,8 @@ function FloorPlanDrawing() {
         x: cellX(cell[0]) + CELL / 2,
         y: cellY(cell[1]) + CELL / 2,
     });
-    const robot = markerCenter(START);
-    const nurse = markerCenter(GOAL);
+    const robot = markerCenter(ROBOT);
+    const nurse = markerCenter(NURSE);
     const labelStyle = {
         paintOrder: "stroke",
         stroke: "#FFFFFF",
@@ -312,7 +277,7 @@ function CheckedCountDrawing() {
         damping: 26,
     });
 
-    const xForStep = (value: number) => remap(value, 0, GOAL_DISTANCE, PLOT_LEFT, PLOT_RIGHT);
+    const xForStep = (value: number) => remap(value, 0, ROUTE_LENGTH, PLOT_LEFT, PLOT_RIGHT);
     const yForCount = (count: number) => remap(count, 0, MAX_COUNT_AXIS, PLOT_BOTTOM, PLOT_TOP);
 
     const handlePointerMove = (event: React.PointerEvent<SVGCircleElement>) => {
@@ -323,7 +288,7 @@ function CheckedCountDrawing() {
         const x = ((event.clientX - rect.left) / rect.width) * VIEW_WIDTH;
         setVar(
             "blindSearchStep",
-            clamp(Math.round(remap(x, PLOT_LEFT, PLOT_RIGHT, 0, GOAL_DISTANCE)), 0, GOAL_DISTANCE),
+            clamp(Math.round(remap(x, PLOT_LEFT, PLOT_RIGHT, 0, ROUTE_LENGTH)), 0, ROUTE_LENGTH),
         );
         setVar("blindSearchExplored", true);
     };

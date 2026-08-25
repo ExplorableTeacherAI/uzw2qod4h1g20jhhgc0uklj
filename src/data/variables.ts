@@ -181,6 +181,57 @@ export const variableDefinitions: Record<string, VariableDefinition> = {
         color: '#8E90F5',
     },
 
+    // ─────────────────────────────────────────
+    // SECTION — Same Path, Less Searching (predict, then watch A* run)
+    // ─────────────────────────────────────────
+    predictedLength: {
+        defaultValue: 10,
+        type: 'number',
+        label: 'Predicted route length',
+        description: "The student's guess at how many steps A*'s route will take",
+        min: 1,
+        max: 30,
+        step: 1,
+        color: '#62D0AD',
+    },
+
+    comparisonRevealed: {
+        defaultValue: false,
+        type: 'boolean',
+        label: 'A* revealed',
+        description: 'Whether the student has committed a prediction and seen A* run',
+    },
+
+    comparisonHighlight: {
+        defaultValue: '',
+        type: 'linkedHighlight',
+        label: 'Comparison highlight',
+        description: "Which part is highlighted: '' | 'blindChecked' | 'astarChecked' | 'prediction'",
+        color: '#62D0AD',
+        bgColor: 'rgba(98, 208, 173, 0.22)',
+    },
+
+    answer_comparison_length: {
+        defaultValue: '',
+        type: 'select',
+        label: 'Route length comparison answer',
+        description: "Student answer: how A*'s route compares in length with the blind search's route",
+        placeholder: '???',
+        correctAnswer: 'exactly as long as',
+        options: ['exactly as long as', 'shorter than', 'longer than'],
+        color: '#8E90F5',
+    },
+
+    answer_comparison_checked: {
+        defaultValue: '',
+        type: 'text',
+        label: 'A* checked count answer',
+        description: 'Student answer: how many squares A* checked on this map',
+        placeholder: '???',
+        correctAnswer: ['54', '54 squares'],
+        color: '#8E90F5',
+    },
+
     answer_blind_search_count: {
         defaultValue: '',
         type: 'text',

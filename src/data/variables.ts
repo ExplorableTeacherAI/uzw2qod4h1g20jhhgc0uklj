@@ -115,6 +115,72 @@ export const variableDefinitions: Record<string, VariableDefinition> = {
         color: '#8E90F5',
     },
 
+    // ─────────────────────────────────────────
+    // SECTION — A Guess Worth Having (walking by the guess alone)
+    // ─────────────────────────────────────────
+    guessWalkCol: {
+        defaultValue: 2,
+        type: 'number',
+        label: 'Robot column',
+        description: 'Column the robot currently stands on while walking by the guess',
+        min: 0,
+        max: 12,
+        step: 1,
+        color: '#62D0AD',
+    },
+
+    guessWalkRow: {
+        defaultValue: 4,
+        type: 'number',
+        label: 'Robot row',
+        description: 'Row the robot currently stands on while walking by the guess',
+        min: 0,
+        max: 8,
+        step: 1,
+        color: '#62D0AD',
+    },
+
+    guessWalkSteps: {
+        defaultValue: 0,
+        type: 'number',
+        label: 'Steps walked',
+        description: 'How many squares the student has stepped the robot along',
+        min: 0,
+        max: 60,
+        step: 1,
+        color: '#62D0AD',
+    },
+
+    guessWalkHighlight: {
+        defaultValue: '',
+        type: 'linkedHighlight',
+        label: 'Guess walk highlight',
+        description: "Which part of the guess map is highlighted: '' | 'guesses' | 'moves'",
+        color: '#62D0AD',
+        bgColor: 'rgba(98, 208, 173, 0.22)',
+    },
+
+    answer_heuristic_value: {
+        defaultValue: '',
+        type: 'text',
+        label: 'Heuristic value answer',
+        description: 'Student answer: the guess for a square three columns and five rows from the nurse',
+        placeholder: '???',
+        correctAnswer: '8',
+        color: '#8E90F5',
+    },
+
+    answer_heuristic_trap: {
+        defaultValue: '',
+        type: 'select',
+        label: 'Heuristic trap answer',
+        description: 'Student answer: what a small guess says nothing about',
+        placeholder: '???',
+        correctAnswer: 'the walls in the way',
+        options: ['the walls in the way', 'the distance to the nurse', 'the size of the room'],
+        color: '#8E90F5',
+    },
+
     answer_blind_search_count: {
         defaultValue: '',
         type: 'text',

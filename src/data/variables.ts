@@ -81,9 +81,50 @@ export interface VariableDefinition {
  *    { defaultValue: { x: 5, y: 10 }, type: 'object', schema: '{ x: number, y: number }' }
  */
 export const variableDefinitions: Record<string, VariableDefinition> = {
-    // ========================================
-    // ADD YOUR VARIABLES HERE
-    // ========================================
+    // ─────────────────────────────────────────
+    // SECTION — Searching Blind (linked pair: floor map + count graph)
+    // ─────────────────────────────────────────
+    blindSearchStep: {
+        defaultValue: 4,
+        type: 'number',
+        label: 'Steps out from the robot',
+        description: 'How far the blind search has spread from the robot, in steps. Shared by the floor map and the count graph.',
+        min: 0,
+        max: 17,
+        step: 1,
+        color: '#62D0AD',
+    },
+
+    blindSearchHighlight: {
+        defaultValue: '',
+        type: 'linkedHighlight',
+        label: 'Blind search highlight',
+        description: "Which part is highlighted across both views: '' | 'checked' | 'frontier'",
+        color: '#62D0AD',
+        bgColor: 'rgba(98, 208, 173, 0.22)',
+    },
+
+    answer_blind_search_order: {
+        defaultValue: '',
+        type: 'select',
+        label: 'Blind search ordering answer',
+        description: 'Student answer: what the blind search orders squares by',
+        placeholder: '???',
+        correctAnswer: 'the robot',
+        options: ['the robot', 'the nurse', 'the nearest wall'],
+        color: '#8E90F5',
+    },
+
+    answer_blind_search_count: {
+        defaultValue: '',
+        type: 'text',
+        label: 'Blind search checked count answer',
+        description: 'Student answer: how many squares the blind search checked before reaching the nurse',
+        placeholder: '???',
+        correctAnswer: ['92', '92 squares'],
+        color: '#8E90F5',
+    },
+
 
     // Uncomment and modify these examples for your lesson:
 

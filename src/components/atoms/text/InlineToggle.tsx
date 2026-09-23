@@ -217,7 +217,9 @@ export const InlineToggle: React.FC<InlineToggleProps> = ({
                         paddingBottom: '2px',
                     }}
                 >
-                    {effectiveOptions[0] || 'option'}
+                    {/* Show the live store value even while editing, so the toggle never
+                        disagrees with reactive readouts bound to the same variable. */}
+                    {currentValue || effectiveOptions[0] || 'option'}
                 </span>
 
                 {/* Edit button on hover */}

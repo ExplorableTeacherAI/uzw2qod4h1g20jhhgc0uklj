@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Pointer, CircleHelp, type LucideIcon, Hand } from 'lucide-react';
 import { 
     type InlineComponentType, 
-    useInlineInteractionHint 
+    useOptionalInlineInteractionHint 
 } from '@/contexts/InlineInteractionHintContext';
 
 // ── Gesture Configuration ─────────────────────────────────────────────────────
@@ -141,7 +141,9 @@ export function useComponentHint(
     options: UseComponentHintOptions = {}
 ) {
     const { enabled = true, delay = 600 } = options;
-    const hintContext = useInlineInteractionHint();
+    // Optional: synced inline components may render in workspaces whose
+    // App.tsx has no provider yet; there the hint is simply never shown.
+    const hintContext = useOptionalInlineInteractionHint();
     const [hintVisible, setHintVisible] = useState(false);
     const [hasRequestedHint, setHasRequestedHint] = useState(false);
 

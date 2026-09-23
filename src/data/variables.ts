@@ -88,6 +88,43 @@ export const variableDefinitions: Record<string, VariableDefinition> = {
     //   blue   #2563EB = student answers and definitions (none of the above)
 
     // ─────────────────────────────────────────
+    // SECTION — Introduction (draw a route yourself)
+    // ─────────────────────────────────────────
+    introRouteSteps: {
+        defaultValue: 0,
+        type: 'number',
+        label: 'Squares crossed by the drawn route',
+        description: "How many steps the student's hand-drawn route takes so far (written by the intro figure, read by the prose)",
+        min: 0,
+        max: 200,
+        step: 1,
+        color: '#8E90F5',
+    },
+
+    introRouteReached: {
+        defaultValue: false,
+        type: 'boolean',
+        label: 'Drawn route reached the nurse',
+        description: "Whether the student's hand-drawn route has arrived at the nurse",
+    },
+
+    introShowShortest: {
+        defaultValue: false,
+        type: 'boolean',
+        label: 'Show a shortest path',
+        description: 'Whether a shortest path is drawn on the intro map for comparison',
+    },
+
+    introHighlight: {
+        defaultValue: '',
+        type: 'linkedHighlight',
+        label: 'Intro map highlight',
+        description: "Which part of the intro map is highlighted: '' | 'walls' | 'route' | 'shortest'",
+        color: '#8E90F5',
+        bgColor: 'rgba(142, 144, 245, 0.22)',
+    },
+
+    // ─────────────────────────────────────────
     // SECTION — Searching Blind (linked pair: floor map + count graph)
     // ─────────────────────────────────────────
     blindSearchStep: {

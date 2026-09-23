@@ -199,6 +199,16 @@ export function useInlineInteractionHint() {
 }
 
 /**
+ * Non-throwing variant for platform components that are synced into older
+ * workspaces whose App.tsx predates InlineInteractionHintProvider. Returns
+ * null when no provider is mounted, so callers can simply skip the hint
+ * instead of blanking the whole lesson with a render error.
+ */
+export function useOptionalInlineInteractionHint() {
+    return useContext(InlineInteractionHintContext);
+}
+
+/**
  * Hook that returns whether the current component should show a hint.
  * Automatically requests the hint on mount (only first caller wins).
  */

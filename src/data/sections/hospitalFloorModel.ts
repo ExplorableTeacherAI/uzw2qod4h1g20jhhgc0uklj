@@ -67,6 +67,77 @@ const tracePath = (cameFrom: Map<string, [number, number]>): [number, number][] 
 
 export const BLIND_ROUTE = tracePath(breadthFirst.cameFrom);
 
+/** Steps from the nurse to every square — a square lies on some shortest path iff its two distances add to ROUTE_LENGTH. */
+const distancesFromNurse = (() => {
+    const distances = Array.from({ length: GRID_ROWS }, () =>
+        Array.from({ length: GRID_COLS }, () => Number.POSITIVE_INFINITY),
+    );
+    distances[NURSE[1]][NURSE[0]] = 0;
+    const queue: [number, number][] = [NURSE];
+    let head = 0;
+    while (head < queue.length) {
+        const [col, row] = queue[head++];
+        const next = distances[row][col] + 1;
+        for (const [dx, dy] of STEPS) {
+            const nextCol = col + dx;
+            const nextRow = row + dy;
+            if (!inGrid(nextCol, nextRow) || isWall(nextCol, nextRow)) continue;
+            if (distances[nextRow][nextCol] <= next) continue;
+            distances[nextRow][nextCol] = next;
+            queue.push([nextCol, nextRow]);
+        }
+    }
+    return distances;
+})();
+
+/** Every shortest path from the robot to the nurse (there are only a few dozen on this floor). */
+const enumerateShortestPaths = (limit: number): [number, number][][] => {
+    const paths: [number, number][][] = [];
+    const walk = (path: [number, number][]) => {
+        if (paths.length >= limit) return;
+        const [col, row] = path[path.length - 1];
+        if (col === NURSE[0] && row === NURSE[1]) {
+            paths.push(path);
+            return;
+        }
+        for (const [dx, dy] of STEPS) {
+            const nextCol = col + dx;
+            const nextRow = row + dy;
+            if (!inGrid(nextCol, nextRow) || isWall(nextCol, nextRow)) continue;
+            if (DISTANCES[nextRow][nextCol] !== path.length) continue;
+            if (distancesFromNurse[nextRow][nextCol] !== ROUTE_LENGTH - path.length) continue;
+            walk([...path, [nextCol, nextRow]]);
+        }
+    };
+    walk([ROBOT]);
+    return paths;
+};
+
+export const ALL_SHORTEST_PATHS = enumerateShortestPaths(2000);
+
+/** A few shortest paths chosen to look as different from one another as possible. */
+export const SHORTEST_PATH_SAMPLE: [number, number][][] = (() => {
+    const key = ([col, row]: [number, number]) => `${col},${row}`;
+    const chosen: [number, number][][] = [];
+    const covered = new Set<string>();
+    while (chosen.length < 4 && chosen.length < ALL_SHORTEST_PATHS.length) {
+        let best: [number, number][] | null = null;
+        let bestNew = -1;
+        for (const path of ALL_SHORTEST_PATHS) {
+            if (chosen.includes(path)) continue;
+            const fresh = path.filter((cell) => !covered.has(key(cell))).length;
+            if (fresh > bestNew) {
+                best = path;
+                bestNew = fresh;
+            }
+        }
+        if (!best) break;
+        chosen.push(best);
+        best.forEach((cell) => covered.add(key(cell)));
+    }
+    return chosen;
+})();
+
 /** Squares the blind search has been through once it is `step` steps out. */
 export const CHECKED_COUNTS: number[] = Array.from({ length: ROUTE_LENGTH + 1 }, (_, step) =>
     DISTANCES.flat().filter((distance) => distance <= step).length,

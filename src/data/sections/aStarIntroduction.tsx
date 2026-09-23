@@ -12,6 +12,7 @@ import {
 import { Figure } from "@/components/molecules";
 import { useSetVar, useVar } from "@/stores";
 import {
+    ALL_SHORTEST_PATHS,
     BLIND_ROUTE,
     GRID_COLS,
     GRID_ROWS,
@@ -20,6 +21,7 @@ import {
     NURSE,
     ROBOT,
     ROUTE_LENGTH,
+    SHORTEST_PATH_SAMPLE,
 } from "./hospitalFloorModel";
 import {
     EASE_150,
@@ -48,8 +50,13 @@ const cellY = (row: number) => GRID_Y + row * CELL;
 const centreX = (col: number) => cellX(col) + CELL / 2;
 const centreY = (row: number) => cellY(row) + CELL / 2;
 
-const pathFor = (cells: [number, number][]) =>
-    cells.map(([col, row], index) => `${index === 0 ? "M" : "L"} ${centreX(col)} ${centreY(row)}`).join(" ");
+const pathFor = (cells: [number, number][], offset = 0) =>
+    cells
+        .map(([col, row], index) => `${index === 0 ? "M" : "L"} ${centreX(col) + offset} ${centreY(row) + offset}`)
+        .join(" ");
+
+/** Sideways nudge for the n-th of several overlapping paths, so shared corridors show every line. */
+const laneOffset = (index: number, count: number) => (index - (count - 1) / 2) * 4.5;
 
 const formatSteps = (count: number) => `${count} ${count === 1 ? "step" : "steps"}`;
 
@@ -154,8 +161,13 @@ function RouteDrawing({
                 <text x="24" y="32" fill={WALKED_TEXT} fontWeight={600} opacity={opacity("route")}>
                     {`your route: ${formatSteps(route.length - 1)}`}
                 </text>
-                <text x={VIEW_WIDTH - 24} y="32" fill={TOTAL_TEXT} textAnchor="end" opacity={opacity("shortest")}>
-                    {showShortest ? `a shortest path: ${formatSteps(ROUTE_LENGTH)}` : `shortest possible: ${formatSteps(ROUTE_LENGTH)}`}
+                {/* Kept clear of the figure's reset icon in the top-right corner. */}
+                <text x={VIEW_WIDTH - 70} y="32" fill={TOTAL_TEXT} textAnchor="end" opacity={opacity("shortest")}>
+                    {isActive("shortest")
+                        ? `${ALL_SHORTEST_PATHS.length} shortest paths, all ${formatSteps(ROUTE_LENGTH)}`
+                        : showShortest
+                          ? `a shortest path: ${formatSteps(ROUTE_LENGTH)}`
+                          : `shortest possible: ${formatSteps(ROUTE_LENGTH)}`}
                 </text>
             </g>
 
@@ -199,22 +211,47 @@ function RouteDrawing({
                 )}
             </g>
 
-            {/* A SHORTEST PATH — shown only when asked for, for comparison. */}
-            {showShortest && (
-                <g {...hoverProps("shortest")} opacity={opacity("shortest")} style={EASE_150}>
-                    <Halo active={isActive("shortest")}>
-                        <path d={pathFor(BLIND_ROUTE)} fill="none" stroke={TOTAL} strokeWidth={weight("shortest", 3) + 6} strokeLinecap="round" strokeLinejoin="round" />
-                    </Halo>
-                    <path
-                        d={pathFor(BLIND_ROUTE)}
-                        fill="none"
-                        stroke={TOTAL}
-                        strokeWidth={weight("shortest", 3)}
-                        strokeDasharray="1 7"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                    />
+            {/* SHORTEST PATHS — one when asked for by the trigger; a handful of
+                different ones, nudged into lanes, while the phrase is hovered. */}
+            {isActive("shortest") ? (
+                <g opacity={opacity("shortest")} style={EASE_150}>
+                    {SHORTEST_PATH_SAMPLE.map((path, index) => (
+                        <g key={`intro-shortest-${index}`}>
+                            <path
+                                d={pathFor(path, laneOffset(index, SHORTEST_PATH_SAMPLE.length))}
+                                fill="none"
+                                stroke={TOTAL}
+                                strokeWidth="9"
+                                opacity={0.18}
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                            />
+                            <path
+                                d={pathFor(path, laneOffset(index, SHORTEST_PATH_SAMPLE.length))}
+                                fill="none"
+                                stroke={TOTAL}
+                                strokeWidth="3"
+                                strokeDasharray="1 6"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                            />
+                        </g>
+                    ))}
                 </g>
+            ) : (
+                showShortest && (
+                    <g {...hoverProps("shortest")} style={EASE_150}>
+                        <path
+                            d={pathFor(BLIND_ROUTE)}
+                            fill="none"
+                            stroke={TOTAL}
+                            strokeWidth="3"
+                            strokeDasharray="1 7"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                        />
+                    </g>
+                )
             )}
 
             {/* YOUR ROUTE — every square the student's hand has crossed. */}
@@ -395,16 +432,16 @@ export const aStarIntroductionBlocks: ReactElement[] = [
                 <InlineTrigger varName="introShowShortest" value={true} icon="zap">
                     show a shortest path
                 </InlineTrigger>{" "}
-                on the map. There is more than one{" "}
+                on the map. It is not the only one: this floor has {ALL_SHORTEST_PATHS.length} different{" "}
                 <InlineLinkedHighlight
                     varName="introHighlight"
                     highlightId="shortest"
                     color={TOTAL}
                     bgColor="rgba(98, 208, 173, 0.22)"
                 >
-                    shortest path
+                    shortest paths
                 </InlineLinkedHighlight>
-                , but none is shorter than {ROUTE_LENGTH} steps.
+                , and every one of them is exactly {ROUTE_LENGTH} steps.
             </EditableParagraph>
         </Block>
     </StackLayout>,

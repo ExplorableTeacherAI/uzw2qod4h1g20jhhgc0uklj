@@ -165,7 +165,7 @@ function PredictionDrawing() {
                 <text x="24" y="32" fill={WALKED_TEXT} opacity={opacity("blindChecked")}>
                     {formatChecked("blind search", BLIND_CHECKED)}
                 </text>
-                <text x={VIEW_WIDTH - 24} y="32" textAnchor="end" fill={TOTAL_TEXT} opacity={opacity("astarChecked")}>
+                <text x={VIEW_WIDTH - 70} y="32" textAnchor="end" fill={TOTAL_TEXT} opacity={opacity("astarChecked")}>
                     {revealed ? formatChecked("A*", ASTAR_CHECKED) : "A* has not run yet"}
                 </text>
             </g>
@@ -500,7 +500,8 @@ function AStarTraceDrawing() {
                 <text x="24" y="32" fill={TOTAL_TEXT} opacity={opacity("checked")}>
                     {`A* has checked ${step} ${step === 1 ? "square" : "squares"}`}
                 </text>
-                <text x={VIEW_WIDTH - 24} y="32" textAnchor="end" fill={INK} opacity={opacity("next")}>
+                {/* Kept clear of the play and reset icons in the top-right corner. */}
+                <text x={VIEW_WIDTH - 104} y="32" textAnchor="end" fill={INK} opacity={opacity("next")}>
                     {done ? "nurse reached: " : "next pick: "}
                     <tspan fill={WALKED_TEXT} fontWeight={600}>{next.g}</tspan>
                     {" + "}

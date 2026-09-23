@@ -5,13 +5,11 @@ import {
     EditableH2,
     EditableParagraph,
     InlineClozeChoice,
-    InlineClozeInput,
     InlineFeedback,
     InlineLinkedHighlight,
     InlineScrubbleNumber,
     InlineSpotColor,
     InteractionHintSequence,
-    RevealOnInteraction,
 } from "@/components/atoms";
 import { Figure, FigureSlider } from "@/components/molecules";
 import { useSetVar, useVar } from "@/stores";
@@ -43,7 +41,6 @@ import {
 } from "./hospitalFloorModel";
 import {
     choicePropsFromDefinition,
-    clozePropsFromDefinition,
     getVariableInfo,
     linkedHighlightPropsFromDefinition,
     numberPropsFromDefinition,
@@ -587,13 +584,13 @@ export const searchingBlindBlocks: ReactElement[] = [
 
     <StackLayout key="layout-blind-search-live" maxWidth="xl">
         <Block id="blind-search-live" padding="sm">
-            <EditableParagraph id="para-blind-search-live" blockId="blind-search-live">Right now the search has spread <InlineScrubbleNumber varName={"blindSearchStep"} defaultValue={4} min={0} max={17} step={1} color={"#8E90F5"} id={"scrubble-1790144016900-wfi4h"} /> steps out from the <InlineSpotColor varName={"actorRobot"} color={"#62CCF9"} id={"spotColor-1790144016901-60wcp"}>robot</InlineSpotColor>, and to get there it has checked <InlineSpotColor varName={"blindSearchStep"} color={"#8E90F5"} id={"spotColor-1790144016901-ppuxi"}>92</InlineSpotColor> squares.</EditableParagraph>
+            <EditableParagraph id="para-blind-search-live" blockId="blind-search-live">Right now the search has spread <InlineScrubbleNumber varName={"blindSearchStep"} defaultValue={4} min={0} max={17} step={1} color={"#8E90F5"} id={"scrubble-1790144016900-wfi4h"} /> steps out from the <InlineSpotColor varName={"actorRobot"} color={"#62CCF9"} id={"spotColor-1790144016901-60wcp"}>robot</InlineSpotColor>, and to get there it has checked <BlindSearchCheckedCount /> squares. Drag that number and both pictures follow it.</EditableParagraph>
         </Block>
     </StackLayout>,
 
     <StackLayout key="layout-blind-search-gap" maxWidth="xl">
         <Block id="blind-search-gap" padding="sm">
-            <EditableParagraph id="para-blind-search-gap" blockId="blind-search-gap">Notice what the search never used: <InlineLinkedHighlight varName={"blindSearchHighlight"} highlightId={"nurse"} color={"#F8A0CD"} bgColor={"rgba(248, 160, 205, 0.25)"} id={"linkedHighlight-1790144500532-13lhd"}>the nurse's position</InlineLinkedHighlight>. It knows perfectly well where she is, and every one of those <InlineLinkedHighlight varName={"blindSearchHighlight"} highlightId={"checked"} color={"#62D0AD"} bgColor={"rgba(142, 144, 245, 0.22)"} id={"linkedHighlight-1790144500532-np1m3"}>shaded squares</InlineLinkedHighlight> was chosen for being close to the <InlineSpotColor varName={"actorRobot"} color={"#62CCF9"} id={"spotColor-1790144500532-4v0ur"}>robot</InlineSpotColor> instead. That pile of checked squares is exactly what A* is going to save.</EditableParagraph>
+            <EditableParagraph id="para-blind-search-gap" blockId="blind-search-gap">Notice what the search never used: <InlineLinkedHighlight varName={"blindSearchHighlight"} highlightId={"nurse"} color={"#F8A0CD"} bgColor={"rgba(248, 160, 205, 0.25)"} id={"linkedHighlight-1790144500532-13lhd"}>the nurse's position</InlineLinkedHighlight>. It knows perfectly well where she is, and every one of those <InlineLinkedHighlight varName={"blindSearchHighlight"} highlightId={"checked"} color={"#8E90F5"} bgColor={"rgba(142, 144, 245, 0.22)"} id={"linkedHighlight-1790144500532-np1m3"}>shaded squares</InlineLinkedHighlight> was chosen for being close to the <InlineSpotColor varName={"actorRobot"} color={"#62CCF9"} id={"spotColor-1790144500532-4v0ur"}>robot</InlineSpotColor> instead. That pile of checked squares is exactly what A* is going to save.</EditableParagraph>
         </Block>
     </StackLayout>,
 

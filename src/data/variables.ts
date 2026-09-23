@@ -314,7 +314,7 @@ export const variableDefinitions: Record<string, VariableDefinition> = {
         defaultValue: '',
         type: 'linkedHighlight',
         label: 'A* step-through highlight',
-        description: "Which part of the step-through is highlighted: '' | 'checked' | 'offered' | 'next'",
+        description: "Which part of the step-through is highlighted: '' | 'traceChecked' | 'traceOffered' | 'traceNext'",
         color: '#62D0AD',
         bgColor: 'rgba(98, 208, 173, 0.22)',
     },

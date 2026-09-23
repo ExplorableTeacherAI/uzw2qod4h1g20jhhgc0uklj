@@ -30,7 +30,7 @@ import {
     WALKED_TEXT,
     WALL_FILL,
 } from "./lessonPalette";
-import { NurseWord, RobotWord } from "./actors";
+import { LivePill, NurseWord, RobotWord } from "./actors";
 import {
     CHECKED_COUNTS,
     DISTANCES,
@@ -530,11 +530,7 @@ function CheckedCountFigure() {
 /** The running total, in prose, through the same formatter as the figures. */
 function BlindSearchCheckedCount() {
     const step = useVar<number>("blindSearchStep", DEFAULT_STEP);
-    return (
-        <InlineSpotColor varName="blindSearchStep" {...spotColorPropsFromDefinition(getVariableInfo('blindSearchStep'))}>
-            {String(checkedAt(step))}
-        </InlineSpotColor>
-    );
+    return <LivePill color={WALKED}>{checkedAt(step)}</LivePill>;
 }
 
 // ── Blocks ───────────────────────────────────────────────────────────────────
@@ -638,48 +634,6 @@ export const searchingBlindBlocks: ReactElement[] = [
                         {...choicePropsFromDefinition(getVariableInfo('answer_blind_search_order'))}
                     />
                 </InlineFeedback>.
-            </EditableParagraph>
-        </Block>
-    </StackLayout>,
-
-    <StackLayout key="layout-blind-search-question-count" maxWidth="xl">
-        <Block id="blind-search-question-count" padding="md">
-            <EditableParagraph id="para-blind-search-question-count" blockId="blind-search-question-count">
-                <RevealOnInteraction varName="blindSearchExplored">
-                    Now wind the search all the way out, until the shading first touches the <NurseWord />. Her route
-                    turns out to be 17 steps long, and the number of squares checked to find it is{" "}
-                    <InlineFeedback
-                        varName="answer_blind_search_count"
-                        correctValue={["92", "92 squares"]}
-                        position="terminal"
-                        successMessage="— 92 squares checked for a 17-step walk, and most of them lay in entirely the wrong direction"
-                        failureMessage="— not quite"
-                        hint="Read the count in the top corner of the map at the moment the shading reaches her"
-                        visualizationHint={{
-                            blockId: "blind-search-grid",
-                            hintKey: "feedback-blind-search-count",
-                            steps: [
-                                {
-                                    gesture: "drag",
-                                    label: "Pull the indigo edge all the way out until it reaches the nurse",
-                                    position: { x: "43%", y: "55%" },
-                                    dragPath: { type: "line", startOffset: { x: -22, y: 0 }, endOffset: { x: 40, y: 0 } },
-                                    completionVar: "blindSearchStep",
-                                    completionValue: 17,
-                                    completionTolerance: 1,
-                                },
-                            ],
-                            label: "Discover it yourself",
-                            resetVars: { blindSearchStep: 4 },
-                        }}
-                    >
-                        <InlineClozeInput
-                            varName="answer_blind_search_count"
-                            correctAnswer={["92", "92 squares"]}
-                            {...clozePropsFromDefinition(getVariableInfo('answer_blind_search_count'))}
-                        />
-                    </InlineFeedback>.
-                </RevealOnInteraction>
             </EditableParagraph>
         </Block>
     </StackLayout>,

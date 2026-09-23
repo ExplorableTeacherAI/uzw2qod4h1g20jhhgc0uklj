@@ -501,11 +501,11 @@ function AStarTraceDrawing() {
 
             {/* Readouts: the running count, and the score of the square being chosen. */}
             <g fontSize="12" style={numberStyle}>
-                <text x="24" y="32" fill={TOTAL_TEXT} opacity={opacity("checked")}>
+                <text x="24" y="32" fill={TOTAL_TEXT} opacity={opacity("traceChecked")}>
                     {`A* has checked ${step} ${step === 1 ? "square" : "squares"}`}
                 </text>
                 {/* Kept clear of the play and reset icons in the top-right corner. */}
-                <text x={VIEW_WIDTH - 104} y="32" textAnchor="end" fill={INK} opacity={opacity("next")}>
+                <text x={VIEW_WIDTH - 104} y="32" textAnchor="end" fill={INK} opacity={opacity("traceNext")}>
                     {done ? "nurse reached: " : "next pick: "}
                     <tspan fill={WALKED_TEXT} fontWeight={600}>{next.g}</tspan>
                     {" + "}
@@ -534,7 +534,7 @@ function AStarTraceDrawing() {
             </g>
 
             {/* CHECKED — every square A* has already looked at, stamped with its total. */}
-            <g {...hoverProps("checked")} opacity={opacity("checked")} style={EASE_150}>
+            <g {...hoverProps("traceChecked")} opacity={opacity("traceChecked")} style={EASE_150}>
                 {checked.map((entry) => (
                     <rect
                         key={`trace-checked-${entry.cell[0]}-${entry.cell[1]}`}
@@ -543,7 +543,7 @@ function AStarTraceDrawing() {
                         width={CELL}
                         height={CELL}
                         fill={ACCENT}
-                        fillOpacity={isActive("checked") ? 0.45 : 0.28}
+                        fillOpacity={isActive("traceChecked") ? 0.45 : 0.28}
                         stroke={ACCENT}
                         strokeWidth="1"
                     />
@@ -568,7 +568,7 @@ function AStarTraceDrawing() {
             </g>
 
             {/* ON OFFER — the squares A* could check next, each with its total. */}
-            <g {...hoverProps("offered")} opacity={opacity("offered")} style={EASE_150}>
+            <g {...hoverProps("traceOffered")} opacity={opacity("traceOffered")} style={EASE_150}>
                 {offered.map((entry) => (
                     <rect
                         key={`trace-offered-${entry.cell[0]}-${entry.cell[1]}`}
@@ -577,13 +577,13 @@ function AStarTraceDrawing() {
                         width={CELL - 2}
                         height={CELL - 2}
                         fill={ACCENT}
-                        fillOpacity={isActive("offered") ? 0.18 : 0.06}
+                        fillOpacity={isActive("traceOffered") ? 0.18 : 0.06}
                         stroke={ACCENT}
-                        strokeWidth={weight("offered", 1.5)}
+                        strokeWidth={weight("traceOffered", 1.5)}
                         strokeDasharray="3 3"
                     />
                 ))}
-                <g fontSize="10" textAnchor="middle" fill={isActive("offered") ? TOTAL_TEXT : "#64748B"} style={numberStyle}>
+                <g fontSize="10" textAnchor="middle" fill={isActive("traceOffered") ? TOTAL_TEXT : "#64748B"} style={numberStyle}>
                     {offered.map((entry) => (
                         <text key={`trace-offered-f-${entry.cell[0]}-${entry.cell[1]}`} x={centreX(entry.cell[0])} y={centreY(entry.cell[1]) + 3.5}>
                             {entry.f}
@@ -594,8 +594,8 @@ function AStarTraceDrawing() {
 
             {/* NEXT — the smallest total on offer, ringed: click it and A* checks it. */}
             {!done && (
-                <g {...hoverProps("next")} opacity={opacity("next")} style={EASE_150}>
-                    <Halo active={isActive("next")}>
+                <g {...hoverProps("traceNext")} opacity={opacity("traceNext")} style={EASE_150}>
+                    <Halo active={isActive("traceNext")}>
                         <rect
                             x={cellX(next.cell[0])}
                             y={cellY(next.cell[1])}
@@ -603,7 +603,7 @@ function AStarTraceDrawing() {
                             height={CELL}
                             fill="none"
                             stroke={ACCENT}
-                            strokeWidth={weight("next", 3) + 6}
+                            strokeWidth={weight("traceNext", 3) + 6}
                         />
                     </Halo>
                     <rect
@@ -614,7 +614,7 @@ function AStarTraceDrawing() {
                         fill={ACCENT}
                         fillOpacity={0.18}
                         stroke={ACCENT}
-                        strokeWidth={weight("next", 3)}
+                        strokeWidth={weight("traceNext", 3)}
                         filter="url(#astar-trace-shadow)"
                     />
                     <text
@@ -822,7 +822,7 @@ export const samePathLessSearchingBlocks: ReactElement[] = [
                 squares, each stamped with the{" "}
                 <InlineLinkedHighlight
                     varName="astarHighlight"
-                    highlightId="checked"
+                    highlightId="traceChecked"
                     {...linkedHighlightPropsFromDefinition(getVariableInfo('astarHighlight'))}
                 >
                     total it was chosen by
@@ -830,7 +830,7 @@ export const samePathLessSearchingBlocks: ReactElement[] = [
                 . Around the edge sit the{" "}
                 <InlineLinkedHighlight
                     varName="astarHighlight"
-                    highlightId="offered"
+                    highlightId="traceOffered"
                     {...linkedHighlightPropsFromDefinition(getVariableInfo('astarHighlight'))}
                 >
                     squares on offer
@@ -838,7 +838,7 @@ export const samePathLessSearchingBlocks: ReactElement[] = [
                 , and the{" "}
                 <InlineLinkedHighlight
                     varName="astarHighlight"
-                    highlightId="next"
+                    highlightId="traceNext"
                     {...linkedHighlightPropsFromDefinition(getVariableInfo('astarHighlight'))}
                 >
                     ringed one

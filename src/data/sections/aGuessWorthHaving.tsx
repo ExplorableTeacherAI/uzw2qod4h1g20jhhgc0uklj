@@ -36,7 +36,7 @@ import {
     WALKED_TEXT,
     WALL_FILL,
 } from "./lessonPalette";
-import { NurseWord, RobotWord } from "./actors";
+import { LivePill, NurseWord, RobotWord } from "./actors";
 import {
     choicePropsFromDefinition,
     clozePropsFromDefinition,
@@ -424,11 +424,7 @@ function GuessWalkLiveGuess() {
 /** Steps walked so far, in the walked-distance colour. */
 function GuessWalkLiveSteps() {
     const steps = useVar<number>("guessWalkSteps", 0);
-    return (
-        <InlineSpotColor varName="guessWalkSteps" {...spotColorPropsFromDefinition(getVariableInfo('guessWalkSteps'))}>
-            {`${steps} ${steps === 1 ? "step" : "steps"}`}
-        </InlineSpotColor>
-    );
+    return <LivePill color={WALKED}>{`${steps} ${steps === 1 ? "step" : "steps"}`}</LivePill>;
 }
 
 // ── Blocks ───────────────────────────────────────────────────────────────────

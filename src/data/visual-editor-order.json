@@ -1,4 +1,482 @@
 {
-  "version": 2,
-  "blockIds": []
+  "version": 3,
+  "blockIds": [
+    "introduction-title",
+    "introduction-hospital-scenario",
+    "introduction-floor-plan",
+    "introduction-route-report",
+    "introduction-promise",
+    "blind-search-heading",
+    "blind-search-setup",
+    "blind-search-cost",
+    "blind-search-grid",
+    "blind-search-count",
+    "blind-search-live",
+    "blind-search-gap",
+    "blind-search-question-order",
+    "heuristic-heading",
+    "heuristic-worked-example",
+    "heuristic-definition",
+    "heuristic-visual",
+    "heuristic-live",
+    "heuristic-both-halves",
+    "heuristic-question-value",
+    "heuristic-question-trap",
+    "comparison-heading",
+    "comparison-scoring",
+    "comparison-formula",
+    "comparison-misconception",
+    "comparison-visual",
+    "comparison-trade",
+    "comparison-trace-intro",
+    "comparison-trace",
+    "comparison-trace-formula",
+    "comparison-trace-reading",
+    "comparison-question-length",
+    "comparison-question-checked",
+    "conclusion-heading",
+    "conclusion-one-family",
+    "conclusion-summary-table",
+    "conclusion-takeaway"
+  ],
+  "rows": [
+    {
+      "id": "layout-introduction-title",
+      "type": "stack",
+      "columns": [
+        [
+          "introduction-title"
+        ]
+      ],
+      "props": {
+        "maxWidth": "xl"
+      }
+    },
+    {
+      "id": "layout-introduction-hospital-scenario",
+      "type": "stack",
+      "columns": [
+        [
+          "introduction-hospital-scenario"
+        ]
+      ],
+      "props": {
+        "maxWidth": "xl"
+      }
+    },
+    {
+      "id": "layout-introduction-floor-plan",
+      "type": "stack",
+      "columns": [
+        [
+          "introduction-floor-plan"
+        ]
+      ],
+      "props": {
+        "maxWidth": "xl"
+      }
+    },
+    {
+      "id": "layout-introduction-route-report",
+      "type": "stack",
+      "columns": [
+        [
+          "introduction-route-report"
+        ]
+      ],
+      "props": {
+        "maxWidth": "xl"
+      }
+    },
+    {
+      "id": "layout-introduction-promise",
+      "type": "stack",
+      "columns": [
+        [
+          "introduction-promise"
+        ]
+      ],
+      "props": {
+        "maxWidth": "xl"
+      }
+    },
+    {
+      "id": "layout-blind-search-heading",
+      "type": "stack",
+      "columns": [
+        [
+          "blind-search-heading"
+        ]
+      ],
+      "props": {
+        "maxWidth": "xl"
+      }
+    },
+    {
+      "id": "layout-blind-search-setup",
+      "type": "stack",
+      "columns": [
+        [
+          "blind-search-setup"
+        ]
+      ],
+      "props": {
+        "maxWidth": "xl"
+      }
+    },
+    {
+      "id": "layout-blind-search-cost",
+      "type": "stack",
+      "columns": [
+        [
+          "blind-search-cost"
+        ]
+      ],
+      "props": {
+        "maxWidth": "xl"
+      }
+    },
+    {
+      "id": "layout-blind-search-pair",
+      "type": "split",
+      "columns": [
+        [
+          "blind-search-grid"
+        ],
+        [
+          "blind-search-count"
+        ]
+      ],
+      "props": {
+        "ratio": "1:1",
+        "gap": "lg",
+        "reverse": false,
+        "align": "start"
+      }
+    },
+    {
+      "id": "layout-blind-search-live",
+      "type": "stack",
+      "columns": [
+        [
+          "blind-search-live"
+        ]
+      ],
+      "props": {
+        "maxWidth": "xl"
+      }
+    },
+    {
+      "id": "layout-blind-search-gap",
+      "type": "stack",
+      "columns": [
+        [
+          "blind-search-gap"
+        ]
+      ],
+      "props": {
+        "maxWidth": "xl"
+      }
+    },
+    {
+      "id": "layout-blind-search-question-order",
+      "type": "stack",
+      "columns": [
+        [
+          "blind-search-question-order"
+        ]
+      ],
+      "props": {
+        "maxWidth": "xl"
+      }
+    },
+    {
+      "id": "layout-heuristic-heading",
+      "type": "stack",
+      "columns": [
+        [
+          "heuristic-heading"
+        ]
+      ],
+      "props": {
+        "maxWidth": "xl"
+      }
+    },
+    {
+      "id": "layout-heuristic-worked-example",
+      "type": "stack",
+      "columns": [
+        [
+          "heuristic-worked-example"
+        ]
+      ],
+      "props": {
+        "maxWidth": "xl"
+      }
+    },
+    {
+      "id": "layout-heuristic-definition",
+      "type": "stack",
+      "columns": [
+        [
+          "heuristic-definition"
+        ]
+      ],
+      "props": {
+        "maxWidth": "xl"
+      }
+    },
+    {
+      "id": "layout-heuristic-walk",
+      "type": "stack",
+      "columns": [
+        [
+          "heuristic-visual"
+        ]
+      ],
+      "props": {
+        "maxWidth": "xl"
+      }
+    },
+    {
+      "id": "layout-heuristic-live",
+      "type": "stack",
+      "columns": [
+        [
+          "heuristic-live"
+        ]
+      ],
+      "props": {
+        "maxWidth": "xl"
+      }
+    },
+    {
+      "id": "layout-heuristic-both-halves",
+      "type": "stack",
+      "columns": [
+        [
+          "heuristic-both-halves"
+        ]
+      ],
+      "props": {
+        "maxWidth": "xl"
+      }
+    },
+    {
+      "id": "layout-heuristic-question-value",
+      "type": "stack",
+      "columns": [
+        [
+          "heuristic-question-value"
+        ]
+      ],
+      "props": {
+        "maxWidth": "xl"
+      }
+    },
+    {
+      "id": "layout-heuristic-question-trap",
+      "type": "stack",
+      "columns": [
+        [
+          "heuristic-question-trap"
+        ]
+      ],
+      "props": {
+        "maxWidth": "xl"
+      }
+    },
+    {
+      "id": "layout-comparison-heading",
+      "type": "stack",
+      "columns": [
+        [
+          "comparison-heading"
+        ]
+      ],
+      "props": {
+        "maxWidth": "xl"
+      }
+    },
+    {
+      "id": "layout-comparison-scoring",
+      "type": "stack",
+      "columns": [
+        [
+          "comparison-scoring"
+        ]
+      ],
+      "props": {
+        "maxWidth": "xl"
+      }
+    },
+    {
+      "id": "layout-comparison-formula",
+      "type": "stack",
+      "columns": [
+        [
+          "comparison-formula"
+        ]
+      ],
+      "props": {
+        "maxWidth": "xl"
+      }
+    },
+    {
+      "id": "layout-comparison-misconception",
+      "type": "stack",
+      "columns": [
+        [
+          "comparison-misconception"
+        ]
+      ],
+      "props": {
+        "maxWidth": "xl"
+      }
+    },
+    {
+      "id": "layout-comparison-visual",
+      "type": "stack",
+      "columns": [
+        [
+          "comparison-visual"
+        ]
+      ],
+      "props": {
+        "maxWidth": "xl"
+      }
+    },
+    {
+      "id": "layout-comparison-trade",
+      "type": "stack",
+      "columns": [
+        [
+          "comparison-trade"
+        ]
+      ],
+      "props": {
+        "maxWidth": "xl"
+      }
+    },
+    {
+      "id": "layout-comparison-trace-intro",
+      "type": "stack",
+      "columns": [
+        [
+          "comparison-trace-intro"
+        ]
+      ],
+      "props": {
+        "maxWidth": "xl"
+      }
+    },
+    {
+      "id": "layout-comparison-trace",
+      "type": "stack",
+      "columns": [
+        [
+          "comparison-trace"
+        ]
+      ],
+      "props": {
+        "maxWidth": "xl"
+      }
+    },
+    {
+      "id": "layout-comparison-trace-formula",
+      "type": "stack",
+      "columns": [
+        [
+          "comparison-trace-formula"
+        ]
+      ],
+      "props": {
+        "maxWidth": "xl"
+      }
+    },
+    {
+      "id": "layout-comparison-trace-reading",
+      "type": "stack",
+      "columns": [
+        [
+          "comparison-trace-reading"
+        ]
+      ],
+      "props": {
+        "maxWidth": "xl"
+      }
+    },
+    {
+      "id": "layout-comparison-question-length",
+      "type": "stack",
+      "columns": [
+        [
+          "comparison-question-length"
+        ]
+      ],
+      "props": {
+        "maxWidth": "xl"
+      }
+    },
+    {
+      "id": "layout-comparison-question-checked",
+      "type": "stack",
+      "columns": [
+        [
+          "comparison-question-checked"
+        ]
+      ],
+      "props": {
+        "maxWidth": "xl"
+      }
+    },
+    {
+      "id": "layout-conclusion-heading",
+      "type": "stack",
+      "columns": [
+        [
+          "conclusion-heading"
+        ]
+      ],
+      "props": {
+        "maxWidth": "xl"
+      }
+    },
+    {
+      "id": "layout-conclusion-one-family",
+      "type": "stack",
+      "columns": [
+        [
+          "conclusion-one-family"
+        ]
+      ],
+      "props": {
+        "maxWidth": "xl"
+      }
+    },
+    {
+      "id": "layout-conclusion-summary-table",
+      "type": "stack",
+      "columns": [
+        [
+          "conclusion-summary-table"
+        ]
+      ],
+      "props": {
+        "maxWidth": "xl"
+      }
+    },
+    {
+      "id": "layout-conclusion-takeaway",
+      "type": "stack",
+      "columns": [
+        [
+          "conclusion-takeaway"
+        ]
+      ],
+      "props": {
+        "maxWidth": "xl"
+      }
+    }
+  ]
 }

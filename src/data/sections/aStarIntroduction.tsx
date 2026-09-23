@@ -5,7 +5,6 @@ import {
     EditableH1,
     EditableParagraph,
     InlineLinkedHighlight,
-    InlineSpotColor,
     InlineTrigger,
     InteractionHintSequence,
 } from "@/components/atoms";
@@ -38,8 +37,8 @@ import {
     WALKED_TEXT,
     WALL_FILL,
 } from "./lessonPalette";
-import { getVariableInfo, linkedHighlightPropsFromDefinition, spotColorPropsFromDefinition } from "../variables";
-import { NurseWord, RobotWord } from "./actors";
+import { getVariableInfo, linkedHighlightPropsFromDefinition } from "../variables";
+import { LivePill, NurseWord, RobotWord } from "./actors";
 
 // ── View geometry — the same frame as the comparison map later on ────────────
 
@@ -366,11 +365,7 @@ function RouteFigure() {
 function IntroRouteReport() {
     const steps = useVar<number>("introRouteSteps", 0);
     const reached = useVar<boolean>("introRouteReached", false);
-    const stepsPill = (
-        <InlineSpotColor varName="introRouteSteps" {...spotColorPropsFromDefinition(getVariableInfo('introRouteSteps'))}>
-            {formatSteps(steps)}
-        </InlineSpotColor>
-    );
+    const stepsPill = <LivePill color={WALKED}>{formatSteps(steps)}</LivePill>;
     if (!reached) {
         return <>Your route so far is {stepsPill} long and has not reached her yet.</>;
     }

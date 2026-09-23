@@ -18,7 +18,6 @@ import { useSetVar, useVar } from "@/stores";
 import { clamp, remap, useSpring } from "@/lib/motion";
 import {
     EASE_150,
-    GUESS,
     INK,
     INK_QUIET,
     INK_STRUCTURE,
@@ -284,7 +283,7 @@ function FloorPlanDrawing() {
             </g>
 
             {/* The two people, drawn last so the shading never buries them. The
-                nurse is amber — the goal colour — because this search never looks at her. */}
+                nurse keeps her own colour; this search never looks at her. */}
             <g opacity={opacity("__structure")} style={EASE_150}>
                 <circle cx={robot.x} cy={robot.y} r="8" fill={ROBOT_FILL} stroke={ROBOT_EDGE} strokeWidth="2" filter="url(#blind-search-marker-shadow)" />
                 <text x={robot.x} y={robot.y - 14} fill={ROBOT_EDGE} fontSize="11" fontWeight={600} textAnchor="middle" style={labelStyle}>robot</text>
@@ -592,15 +591,7 @@ export const searchingBlindBlocks: ReactElement[] = [
 
     <StackLayout key="layout-blind-search-live" maxWidth="xl">
         <Block id="blind-search-live" padding="sm">
-            <EditableParagraph id="para-blind-search-live" blockId="blind-search-live">
-                Right now the search has spread{" "}
-                <InlineScrubbleNumber
-                    varName="blindSearchStep"
-                    {...numberPropsFromDefinition(getVariableInfo('blindSearchStep'))}
-                />{" "}
-                steps out from the <RobotWord />, and to get there it has checked <BlindSearchCheckedCount /> squares.
-                Drag that number and both pictures follow it.
-            </EditableParagraph>
+            <EditableParagraph id="para-blind-search-live" blockId="blind-search-live">Right now the search has spread <InlineScrubbleNumber varName={"blindSearchStep"} defaultValue={4} min={0} max={17} step={1} color={"#8E90F5"} id={"scrubble-1790144016900-wfi4h"} /> steps out from the <InlineSpotColor varName={"actorRobot"} color={"#62CCF9"} id={"spotColor-1790144016901-60wcp"}>robot</InlineSpotColor>, and to get there it has checked <InlineSpotColor varName={"blindSearchStep"} color={"#8E90F5"} id={"spotColor-1790144016901-ppuxi"}>92</InlineSpotColor> squares.</EditableParagraph>
         </Block>
     </StackLayout>,
 
@@ -611,8 +602,8 @@ export const searchingBlindBlocks: ReactElement[] = [
                 <InlineLinkedHighlight
                     varName="blindSearchHighlight"
                     highlightId="nurse"
-                    color={GUESS}
-                    bgColor="rgba(247, 178, 59, 0.22)"
+                    color={NURSE_RING}
+                    bgColor="rgba(248, 160, 205, 0.25)"
                 >
                     the nurse's position
                 </InlineLinkedHighlight>

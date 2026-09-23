@@ -22,11 +22,15 @@ export const TOTAL = "#62D0AD";
 export const TOTAL_TEXT = "#1F9E78";
 export const TOTAL_BG = "rgba(98, 208, 173, 0.22)";
 
-/** The two people: the robot shares the walked-distance hue, the nurse the guess hue. */
-export const ROBOT_FILL = WALKED;
-export const ROBOT_EDGE = WALKED_TEXT;
-export const NURSE_RING = GUESS;
-export const NURSE_TEXT = GUESS_TEXT;
+/**
+ * The two people get hues of their own, used for nothing else, so "robot" never
+ * reads as "steps walked" and "nurse" never reads as "the guess":
+ * sky blue for the robot, rose for the nurse.
+ */
+export const ROBOT_FILL = "#62CCF9";
+export const ROBOT_EDGE = "#1E8FC2";
+export const NURSE_RING = "#F8A0CD";
+export const NURSE_TEXT = "#C4508F";
 
 /** Student answers and definitions — deliberately none of the three quantity hues. */
 export const ANSWER = "#2563EB";

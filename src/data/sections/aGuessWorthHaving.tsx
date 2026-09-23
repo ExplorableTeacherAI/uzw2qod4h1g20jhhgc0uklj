@@ -414,15 +414,9 @@ function GuessWalkLiveGuess() {
     const up = Math.abs(row - NURSE[1]);
     return (
         <>
-            <InlineSpotColor varName="astarNextH" {...spotColorPropsFromDefinition(getVariableInfo('astarNextH'))}>
-                {`${across} ${across === 1 ? "column" : "columns"}`}
-            </InlineSpotColor>{" "}
-            and{" "}
-            <InlineSpotColor varName="astarNextH" {...spotColorPropsFromDefinition(getVariableInfo('astarNextH'))}>
-                {`${up} ${up === 1 ? "row" : "rows"}`}
-            </InlineSpotColor>{" "}
-            from the <NurseWord />, so its guess is{" "}
-            <InlineFormula latex={`\\clr{h}{h} = ${across} + ${up} = \\clr{h}{${across + up}}`} colorMap={FORMULA_COLORS} />
+            {`${across} ${across === 1 ? "column" : "columns"} and ${up} ${up === 1 ? "row" : "rows"}`} from the{" "}
+            <NurseWord />, so its guess is{" "}
+            <InlineFormula latex={`\\clr{h}{h} = \\clr{h}{${across}} + \\clr{h}{${up}} = \\clr{h}{${across + up}}`} colorMap={FORMULA_COLORS} />
         </>
     );
 }
@@ -454,7 +448,7 @@ export const aGuessWorthHavingBlocks: ReactElement[] = [
                 The <RobotWord /> does know one thing it was not using: where the <NurseWord /> is. Even with walls in the way it
                 can guess the distance left by counting squares as if the floor were empty, across and then up.
                 From four columns and three rows away, that guess is{" "}
-                <InlineFormula latex="\clr{h}{h} = 4 + 3 = \clr{h}{7}" colorMap={FORMULA_COLORS} />.
+                <InlineFormula latex="\clr{h}{h} = \clr{h}{4} + \clr{h}{3} = \clr{h}{7}" colorMap={FORMULA_COLORS} />.
             </EditableParagraph>
         </Block>
     </StackLayout>,

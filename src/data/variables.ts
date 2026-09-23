@@ -86,6 +86,7 @@ export const variableDefinitions: Record<string, VariableDefinition> = {
     //   amber  #F7B23B = h, the guess of steps left to the nurse
     //   teal   #62D0AD = f = g + h, A*'s score and everything A* does
     //   blue   #2563EB = student answers and definitions (none of the above)
+    //   sky    #62CCF9 = the robot, rose #F8A0CD = the nurse (people, not quantities)
 
     // ─────────────────────────────────────────
     // THE TWO PEOPLE — colour keys for the "robot" / "nurse" pills in prose
@@ -94,16 +95,16 @@ export const variableDefinitions: Record<string, VariableDefinition> = {
         defaultValue: 'robot',
         type: 'text',
         label: 'Robot',
-        description: 'Colour key for the robot: indigo, the hue of every distance measured from it',
-        color: '#8E90F5',
+        description: 'Colour key for the robot: sky blue, used for nothing else',
+        color: '#62CCF9',
     },
 
     actorNurse: {
         defaultValue: 'nurse',
         type: 'text',
         label: 'Nurse',
-        description: 'Colour key for the nurse: amber, the hue of every guess measured to her',
-        color: '#F7B23B',
+        description: 'Colour key for the nurse: rose, used for nothing else',
+        color: '#F8A0CD',
     },
 
     // ─────────────────────────────────────────

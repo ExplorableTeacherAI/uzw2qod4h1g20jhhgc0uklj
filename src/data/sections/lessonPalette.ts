@@ -22,6 +22,12 @@ export const TOTAL = "#62D0AD";
 export const TOTAL_TEXT = "#1F9E78";
 export const TOTAL_BG = "rgba(98, 208, 173, 0.22)";
 
+/** The two people: the robot shares the walked-distance hue, the nurse the guess hue. */
+export const ROBOT_FILL = WALKED;
+export const ROBOT_EDGE = WALKED_TEXT;
+export const NURSE_RING = GUESS;
+export const NURSE_TEXT = GUESS_TEXT;
+
 /** Student answers and definitions — deliberately none of the three quantity hues. */
 export const ANSWER = "#2563EB";
 export const ANSWER_BG = "rgba(37, 99, 235, 0.12)";

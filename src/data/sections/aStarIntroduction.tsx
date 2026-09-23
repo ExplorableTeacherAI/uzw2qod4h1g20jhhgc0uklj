@@ -25,10 +25,13 @@ import {
 } from "./hospitalFloorModel";
 import {
     EASE_150,
-    GUESS,
     INK,
     INK_QUIET,
     LABEL_OUTLINE,
+    NURSE_RING,
+    NURSE_TEXT,
+    ROBOT_EDGE,
+    ROBOT_FILL,
     TOTAL,
     TOTAL_TEXT,
     WALKED,
@@ -36,6 +39,7 @@ import {
     WALL_FILL,
 } from "./lessonPalette";
 import { getVariableInfo, linkedHighlightPropsFromDefinition, spotColorPropsFromDefinition } from "../variables";
+import { NurseWord, RobotWord } from "./actors";
 
 // ── View geometry — the same frame as the comparison map later on ────────────
 
@@ -284,12 +288,12 @@ function RouteDrawing({
 
             {/* The two people, drawn last so nothing buries them. */}
             <g opacity={opacity("__structure")} style={EASE_150}>
-                <circle cx={centreX(ROBOT[0])} cy={centreY(ROBOT[1])} r="8" fill={INK} filter="url(#intro-route-shadow)" />
-                <circle cx={centreX(NURSE[0])} cy={centreY(NURSE[1])} r="8" fill="#FFFFFF" stroke={GUESS} strokeWidth="2.5" />
-                <circle cx={centreX(NURSE[0])} cy={centreY(NURSE[1])} r="3" fill={GUESS} />
-                <g fill={INK} fontSize="11" textAnchor="middle" style={labelStyle}>
-                    <text x={centreX(ROBOT[0])} y={centreY(ROBOT[1]) - 16}>robot</text>
-                    <text x={centreX(NURSE[0])} y={centreY(NURSE[1]) - 16}>nurse</text>
+                <circle cx={centreX(ROBOT[0])} cy={centreY(ROBOT[1])} r="8" fill={ROBOT_FILL} stroke={ROBOT_EDGE} strokeWidth="2" filter="url(#intro-route-shadow)" />
+                <circle cx={centreX(NURSE[0])} cy={centreY(NURSE[1])} r="8" fill="#FFFFFF" stroke={NURSE_RING} strokeWidth="2.5" />
+                <circle cx={centreX(NURSE[0])} cy={centreY(NURSE[1])} r="3" fill={NURSE_RING} />
+                <g fontSize="11" fontWeight={600} textAnchor="middle" style={labelStyle}>
+                    <text x={centreX(ROBOT[0])} y={centreY(ROBOT[1]) - 16} fill={ROBOT_EDGE}>robot</text>
+                    <text x={centreX(NURSE[0])} y={centreY(NURSE[1]) - 16} fill={NURSE_TEXT}>nurse</text>
                 </g>
             </g>
 
@@ -393,8 +397,8 @@ export const aStarIntroductionBlocks: ReactElement[] = [
     <StackLayout key="layout-introduction-hospital-scenario" maxWidth="xl">
         <Block id="introduction-hospital-scenario" padding="sm">
             <EditableParagraph id="para-introduction-hospital-scenario" blockId="introduction-hospital-scenario">
-                A delivery robot is parked somewhere on the fourth floor of a hospital, and a nurse three
-                corridors away needs a blood sample. The robot has a map of the building, cut into a grid of
+                A delivery <RobotWord /> is parked somewhere on the fourth floor of a hospital, and a <NurseWord /> three
+                corridors away needs a blood sample. The <RobotWord /> has a map of the building, cut into a grid of
                 squares: some are open floor, some are{" "}
                 <InlineLinkedHighlight
                     varName="introHighlight"
@@ -427,7 +431,7 @@ export const aStarIntroductionBlocks: ReactElement[] = [
     <StackLayout key="layout-introduction-route-report" maxWidth="xl">
         <Block id="introduction-route-report" padding="sm">
             <EditableParagraph id="para-introduction-route-report" blockId="introduction-route-report">
-                <IntroRouteReport /> Every step costs the robot time, so the difference matters. If you want to
+                <IntroRouteReport /> Every step costs the <RobotWord /> time, so the difference matters. If you want to
                 compare, you can{" "}
                 <InlineTrigger varName="introShowShortest" value={true} icon="zap">
                     show a shortest path
@@ -449,7 +453,7 @@ export const aStarIntroductionBlocks: ReactElement[] = [
     <StackLayout key="layout-introduction-promise" maxWidth="xl">
         <Block id="introduction-promise" padding="sm">
             <EditableParagraph id="para-introduction-promise" blockId="introduction-promise">
-                Finding that route is easy for you, looking at the whole map at once. The robot cannot do that.
+                Finding that route is easy for you, looking at the whole map at once. The <RobotWord /> cannot do that.
                 It has to check squares one at a time, and checking costs time. Here we build up the A* algorithm,
                 the method that decides which square to check next, and by the end you will be able to say why it
                 gets away with checking so many fewer squares than the obvious approach.

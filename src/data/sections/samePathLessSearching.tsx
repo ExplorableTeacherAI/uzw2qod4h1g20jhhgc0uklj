@@ -35,17 +35,21 @@ import {
 import {
     EASE_150,
     FORMULA_COLORS,
-    GUESS,
     GUESS_TEXT,
     INK,
     INK_QUIET,
     LABEL_OUTLINE,
+    NURSE_RING,
+    NURSE_TEXT,
+    ROBOT_EDGE,
+    ROBOT_FILL,
     TOTAL,
     TOTAL_TEXT,
     WALKED,
     WALKED_TEXT,
     WALL_FILL,
 } from "./lessonPalette";
+import { NurseWord, RobotWord } from "./actors";
 import {
     choicePropsFromDefinition,
     clozePropsFromDefinition,
@@ -230,12 +234,12 @@ function PredictionDrawing() {
                 {revealed && (
                     <path d={pathFor(ASTAR_ROUTE)} fill="none" stroke={ACCENT} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
                 )}
-                <circle cx={centreX(ROBOT[0])} cy={centreY(ROBOT[1])} r="8" fill={INK} filter="url(#comparison-shadow)" />
-                <circle cx={centreX(NURSE[0])} cy={centreY(NURSE[1])} r="8" fill="#FFFFFF" stroke={GUESS} strokeWidth="2.5" />
-                <circle cx={centreX(NURSE[0])} cy={centreY(NURSE[1])} r="3" fill={GUESS} />
-                <g fill={INK} fontSize="11" textAnchor="middle" style={labelStyle}>
-                    <text x={centreX(ROBOT[0])} y={centreY(ROBOT[1]) - 16}>robot</text>
-                    <text x={centreX(NURSE[0])} y={centreY(NURSE[1]) - 16}>nurse</text>
+                <circle cx={centreX(ROBOT[0])} cy={centreY(ROBOT[1])} r="8" fill={ROBOT_FILL} stroke={ROBOT_EDGE} strokeWidth="2" filter="url(#comparison-shadow)" />
+                <circle cx={centreX(NURSE[0])} cy={centreY(NURSE[1])} r="8" fill="#FFFFFF" stroke={NURSE_RING} strokeWidth="2.5" />
+                <circle cx={centreX(NURSE[0])} cy={centreY(NURSE[1])} r="3" fill={NURSE_RING} />
+                <g fontSize="11" fontWeight={600} textAnchor="middle" style={labelStyle}>
+                    <text x={centreX(ROBOT[0])} y={centreY(ROBOT[1]) - 16} fill={ROBOT_EDGE}>robot</text>
+                    <text x={centreX(NURSE[0])} y={centreY(NURSE[1]) - 16} fill={NURSE_TEXT}>nurse</text>
                 </g>
             </g>
 
@@ -629,12 +633,12 @@ function AStarTraceDrawing() {
 
             {/* The two people, drawn last so nothing buries them. */}
             <g opacity={opacity("__structure")} style={EASE_150}>
-                <circle cx={centreX(ROBOT[0])} cy={centreY(ROBOT[1])} r="8" fill={INK} filter="url(#astar-trace-shadow)" />
-                <circle cx={centreX(NURSE[0])} cy={centreY(NURSE[1])} r="8" fill="#FFFFFF" stroke={GUESS} strokeWidth="2.5" />
-                <circle cx={centreX(NURSE[0])} cy={centreY(NURSE[1])} r="3" fill={GUESS} />
-                <g fill={INK} fontSize="11" textAnchor="middle" style={labelStyle}>
-                    <text x={centreX(ROBOT[0])} y={centreY(ROBOT[1]) - 16}>robot</text>
-                    <text x={centreX(NURSE[0])} y={centreY(NURSE[1]) - 16}>nurse</text>
+                <circle cx={centreX(ROBOT[0])} cy={centreY(ROBOT[1])} r="8" fill={ROBOT_FILL} stroke={ROBOT_EDGE} strokeWidth="2" filter="url(#astar-trace-shadow)" />
+                <circle cx={centreX(NURSE[0])} cy={centreY(NURSE[1])} r="8" fill="#FFFFFF" stroke={NURSE_RING} strokeWidth="2.5" />
+                <circle cx={centreX(NURSE[0])} cy={centreY(NURSE[1])} r="3" fill={NURSE_RING} />
+                <g fontSize="11" fontWeight={600} textAnchor="middle" style={labelStyle}>
+                    <text x={centreX(ROBOT[0])} y={centreY(ROBOT[1]) - 16} fill={ROBOT_EDGE}>robot</text>
+                    <text x={centreX(NURSE[0])} y={centreY(NURSE[1]) - 16} fill={NURSE_TEXT}>nurse</text>
                 </g>
             </g>
 
@@ -750,7 +754,7 @@ export const samePathLessSearchingBlocks: ReactElement[] = [
                 <InlineSpotColor varName="astarNextF" {...spotColorPropsFromDefinition(getVariableInfo('astarNextF'))}>
                     smallest total
                 </InlineSpotColor>{" "}
-                next. A square behind the robot scores badly because the walk there was wasted, and a far-off
+                next. A square behind the <RobotWord /> scores badly because the walk there was wasted, and a far-off
                 square scores badly because its guess is large.
             </EditableParagraph>
         </Block>
@@ -795,7 +799,7 @@ export const samePathLessSearchingBlocks: ReactElement[] = [
                     walked-distance
                 </InlineSpotColor>{" "}
                 half of the score still refuses to let a longer one win. What it bought is the search, which
-                stopped wandering backwards and leaned towards the nurse. Same route,{" "}
+                stopped wandering backwards and leaned towards the <NurseWord />. Same route,{" "}
                 <InlineLinkedHighlight
                     varName="comparisonHighlight"
                     highlightId="astarChecked"
@@ -862,7 +866,7 @@ export const samePathLessSearchingBlocks: ReactElement[] = [
     <StackLayout key="layout-comparison-trace-reading" maxWidth="xl">
         <Block id="comparison-trace-reading" padding="sm">
             <EditableParagraph id="para-comparison-trace-reading" blockId="comparison-trace-reading">
-                Watch the two halves pull against each other. Squares back near the robot keep a small{" "}
+                Watch the two halves pull against each other. Squares back near the <RobotWord /> keep a small{" "}
                 <InlineSpotColor varName="astarNextG" {...spotColorPropsFromDefinition(getVariableInfo('astarNextG'))}>
                     walked distance
                 </InlineSpotColor>{" "}
@@ -871,7 +875,7 @@ export const samePathLessSearchingBlocks: ReactElement[] = [
                     guess
                 </InlineSpotColor>
                 ; squares out past the wall have walked further but guess less. Whenever the totals tie, A* takes
-                the smaller guess, which is why it leans towards the nurse instead of filling the room ring by
+                the smaller guess, which is why it leans towards the <NurseWord /> instead of filling the room ring by
                 ring, and why the far corners of the map never get checked at all.
             </EditableParagraph>
         </Block>

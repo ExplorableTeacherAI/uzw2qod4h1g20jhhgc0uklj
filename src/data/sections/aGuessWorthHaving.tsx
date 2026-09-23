@@ -28,10 +28,15 @@ import {
     INK,
     INK_QUIET,
     LABEL_OUTLINE,
+    NURSE_RING,
+    NURSE_TEXT,
+    ROBOT_EDGE,
+    ROBOT_FILL,
     WALKED,
     WALKED_TEXT,
     WALL_FILL,
 } from "./lessonPalette";
+import { NurseWord, RobotWord } from "./actors";
 import {
     choicePropsFromDefinition,
     clozePropsFromDefinition,
@@ -272,12 +277,12 @@ function GuessWalkDrawing({
 
             {/* The two people, drawn last so nothing buries them. */}
             <g opacity={opacity("__structure")} style={EASE_150}>
-                <circle cx={centreX(col)} cy={centreY(row)} r="8" fill={INK} filter="url(#guess-walk-shadow)" />
-                <circle cx={centreX(NURSE[0])} cy={centreY(NURSE[1])} r="8" fill="#FFFFFF" stroke={GUESS} strokeWidth="2.5" />
-                <circle cx={centreX(NURSE[0])} cy={centreY(NURSE[1])} r="3" fill={GUESS} />
-                <g fill={INK} fontSize="11" textAnchor="middle" style={labelStyle}>
-                    <text x={centreX(col)} y={centreY(row) - 14}>robot</text>
-                    <text x={centreX(NURSE[0])} y={centreY(NURSE[1]) - 14}>nurse</text>
+                <circle cx={centreX(col)} cy={centreY(row)} r="8" fill={ROBOT_FILL} stroke={ROBOT_EDGE} strokeWidth="2" filter="url(#guess-walk-shadow)" />
+                <circle cx={centreX(NURSE[0])} cy={centreY(NURSE[1])} r="8" fill="#FFFFFF" stroke={NURSE_RING} strokeWidth="2.5" />
+                <circle cx={centreX(NURSE[0])} cy={centreY(NURSE[1])} r="3" fill={NURSE_RING} />
+                <g fontSize="11" fontWeight={600} textAnchor="middle" style={labelStyle}>
+                    <text x={centreX(col)} y={centreY(row) - 14} fill={ROBOT_EDGE}>robot</text>
+                    <text x={centreX(NURSE[0])} y={centreY(NURSE[1]) - 14} fill={NURSE_TEXT}>nurse</text>
                 </g>
             </g>
 
@@ -416,7 +421,7 @@ function GuessWalkLiveGuess() {
             <InlineSpotColor varName="astarNextH" {...spotColorPropsFromDefinition(getVariableInfo('astarNextH'))}>
                 {`${up} ${up === 1 ? "row" : "rows"}`}
             </InlineSpotColor>{" "}
-            from the nurse, so its guess is{" "}
+            from the <NurseWord />, so its guess is{" "}
             <InlineFormula latex={`\\clr{h}{h} = ${across} + ${up} = \\clr{h}{${across + up}}`} colorMap={FORMULA_COLORS} />
         </>
     );
@@ -446,7 +451,7 @@ export const aGuessWorthHavingBlocks: ReactElement[] = [
     <StackLayout key="layout-heuristic-worked-example" maxWidth="xl">
         <Block id="heuristic-worked-example" padding="sm">
             <EditableParagraph id="para-heuristic-worked-example" blockId="heuristic-worked-example">
-                The robot does know one thing it was not using: where the nurse is. Even with walls in the way it
+                The <RobotWord /> does know one thing it was not using: where the <NurseWord /> is. Even with walls in the way it
                 can guess the distance left by counting squares as if the floor were empty, across and then up.
                 From four columns and three rows away, that guess is{" "}
                 <InlineFormula latex="\clr{h}{h} = 4 + 3 = \clr{h}{7}" colorMap={FORMULA_COLORS} />.
@@ -468,7 +473,7 @@ export const aGuessWorthHavingBlocks: ReactElement[] = [
                 </InlineTooltip>
                 : a cheap estimate that is never allowed to overshoot the true remaining distance. Walls can only
                 make the real journey longer, never shorter, so counting across-and-up is always safe. Now walk
-                the robot yourself: click a neighbouring square to step onto it, always taking the{" "}
+                the <RobotWord /> yourself: click a neighbouring square to step onto it, always taking the{" "}
                 <InlineLinkedHighlight
                     varName="guessWalkHighlight"
                     highlightId="moves"
@@ -499,7 +504,7 @@ export const aGuessWorthHavingBlocks: ReactElement[] = [
     <StackLayout key="layout-heuristic-live" maxWidth="xl">
         <Block id="heuristic-live" padding="sm">
             <EditableParagraph id="para-heuristic-live" blockId="heuristic-live">
-                The robot now stands <GuessWalkLiveGuess />, having walked <GuessWalkLiveSteps /> to get there. When
+                The <RobotWord /> now stands <GuessWalkLiveGuess />, having walked <GuessWalkLiveSteps /> to get there. When
                 you have seen it stuck, you can{" "}
                 <InlineTrigger
                     varName="guessWalkCol"
@@ -530,7 +535,7 @@ export const aGuessWorthHavingBlocks: ReactElement[] = [
                 >
                     The guess
                 </InlineLinkedHighlight>{" "}
-                pulls hard towards the nurse, and then a wall it knows nothing about leaves every neighbour
+                pulls hard towards the <NurseWord />, and then a wall it knows nothing about leaves every neighbour
                 looking worse than where you stand. So the guess alone is not enough, and ignoring it wastes half
                 the search. A* keeps both halves: the{" "}
                 <InlineSpotColor varName="guessWalkSteps" {...spotColorPropsFromDefinition(getVariableInfo('guessWalkSteps'))}>
@@ -548,7 +553,7 @@ export const aGuessWorthHavingBlocks: ReactElement[] = [
     <StackLayout key="layout-heuristic-question-value" maxWidth="xl">
         <Block id="heuristic-question-value" padding="md">
             <EditableParagraph id="para-heuristic-question-value" blockId="heuristic-question-value">
-                A square three columns and five rows away from the nurse therefore carries a guess of{" "}
+                A square three columns and five rows away from the <NurseWord /> therefore carries a guess of{" "}
                 <InlineFeedback
                     varName="answer_heuristic_value"
                     correctValue="8"
@@ -571,7 +576,7 @@ export const aGuessWorthHavingBlocks: ReactElement[] = [
         <Block id="heuristic-question-trap" padding="md">
             <EditableParagraph id="para-heuristic-question-trap" blockId="heuristic-question-trap">
                 <RevealOnInteraction varName="guessWalkExplored">
-                    Walking by the guess alone strands the robot because a small guess says nothing at all about{" "}
+                    Walking by the guess alone strands the <RobotWord /> because a small guess says nothing at all about{" "}
                     <InlineFeedback
                         varName="answer_heuristic_trap"
                         correctValue="the walls in the way"

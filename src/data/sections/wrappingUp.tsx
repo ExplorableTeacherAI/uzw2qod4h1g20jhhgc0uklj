@@ -12,6 +12,7 @@ import {
 import { ASTAR_CHECKED, BLIND_CHECKED, ROUTE_LENGTH } from "./hospitalFloorModel";
 import { FORMULA_COLORS, GUESS, TOTAL, WALKED } from "./lessonPalette";
 import { getVariableInfo, spotColorPropsFromDefinition } from "../variables";
+import { NurseWord, RobotWord } from "./actors";
 
 export const wrappingUpBlocks: ReactElement[] = [
     <StackLayout key="layout-conclusion-heading" maxWidth="xl">
@@ -25,8 +26,8 @@ export const wrappingUpBlocks: ReactElement[] = [
     <StackLayout key="layout-conclusion-one-family" maxWidth="xl">
         <Block id="conclusion-one-family" padding="sm">
             <EditableParagraph id="para-conclusion-one-family" blockId="conclusion-one-family">
-                The blind search and A* were never really different algorithms. Both work outwards from the
-                robot taking the cheapest square next; A* simply adds the{" "}
+                The blind search and A* were never really different algorithms. Both work outwards from the{" "}
+                <RobotWord /> taking the cheapest square next; A* simply adds the{" "}
                 <InlineSpotColor varName="astarNextH" {...spotColorPropsFromDefinition(getVariableInfo('astarNextH'))}>
                     guess
                 </InlineSpotColor>{" "}
@@ -34,7 +35,7 @@ export const wrappingUpBlocks: ReactElement[] = [
                 <InlineSpotColor varName="astarNextG" {...spotColorPropsFromDefinition(getVariableInfo('astarNextG'))}>
                     steps walked
                 </InlineSpotColor>
-                , so cheapest comes to mean close to the nurse as well as close to home. Drop the guess to zero,{" "}
+                , so cheapest comes to mean close to the <NurseWord /> as well as close to home. Drop the guess to zero,{" "}
                 <InlineFormula latex="\clr{f}{f} = \clr{g}{g} + \clr{h}{0} = \clr{g}{g}" colorMap={FORMULA_COLORS} />
                 , and A* turns back into the blind search, which is exactly what happens on a map where nobody
                 knows which way the goal lies.
@@ -60,7 +61,7 @@ export const wrappingUpBlocks: ReactElement[] = [
                     },
                     {
                         cells: [
-                            "Uses the nurse's position",
+                            <>Uses the <NurseWord>nurse's</NurseWord> position</>,
                             "never",
                             <InlineSpotColor varName="astarNextH" {...spotColorPropsFromDefinition(getVariableInfo('astarNextH'))}>
                                 in every guess

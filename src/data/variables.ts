@@ -88,6 +88,25 @@ export const variableDefinitions: Record<string, VariableDefinition> = {
     //   blue   #2563EB = student answers and definitions (none of the above)
 
     // ─────────────────────────────────────────
+    // THE TWO PEOPLE — colour keys for the "robot" / "nurse" pills in prose
+    // ─────────────────────────────────────────
+    actorRobot: {
+        defaultValue: 'robot',
+        type: 'text',
+        label: 'Robot',
+        description: 'Colour key for the robot: indigo, the hue of every distance measured from it',
+        color: '#8E90F5',
+    },
+
+    actorNurse: {
+        defaultValue: 'nurse',
+        type: 'text',
+        label: 'Nurse',
+        description: 'Colour key for the nurse: amber, the hue of every guess measured to her',
+        color: '#F7B23B',
+    },
+
+    // ─────────────────────────────────────────
     // SECTION — Introduction (draw a route yourself)
     // ─────────────────────────────────────────
     introRouteSteps: {

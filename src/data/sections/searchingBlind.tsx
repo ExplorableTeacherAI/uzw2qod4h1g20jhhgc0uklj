@@ -23,10 +23,15 @@ import {
     INK_QUIET,
     INK_STRUCTURE,
     LABEL_OUTLINE,
+    NURSE_RING,
+    NURSE_TEXT,
+    ROBOT_EDGE,
+    ROBOT_FILL,
     WALKED,
     WALKED_TEXT,
     WALL_FILL,
 } from "./lessonPalette";
+import { NurseWord, RobotWord } from "./actors";
 import {
     CHECKED_COUNTS,
     DISTANCES,
@@ -281,16 +286,16 @@ function FloorPlanDrawing() {
             {/* The two people, drawn last so the shading never buries them. The
                 nurse is amber — the goal colour — because this search never looks at her. */}
             <g opacity={opacity("__structure")} style={EASE_150}>
-                <circle cx={robot.x} cy={robot.y} r="8" fill={INK} filter="url(#blind-search-marker-shadow)" />
-                <text x={robot.x} y={robot.y - 14} fill={INK} fontSize="11" textAnchor="middle" style={labelStyle}>robot</text>
+                <circle cx={robot.x} cy={robot.y} r="8" fill={ROBOT_FILL} stroke={ROBOT_EDGE} strokeWidth="2" filter="url(#blind-search-marker-shadow)" />
+                <text x={robot.x} y={robot.y - 14} fill={ROBOT_EDGE} fontSize="11" fontWeight={600} textAnchor="middle" style={labelStyle}>robot</text>
             </g>
             <g {...hoverProps("nurse")} opacity={opacity("nurse")} style={EASE_150}>
                 <Halo active={isActive("nurse")}>
-                    <circle cx={nurse.x} cy={nurse.y} r="8" fill="none" stroke={GUESS} strokeWidth={weight("nurse", 2.5) + 6} />
+                    <circle cx={nurse.x} cy={nurse.y} r="8" fill="none" stroke={NURSE_RING} strokeWidth={weight("nurse", 2.5) + 6} />
                 </Halo>
-                <circle cx={nurse.x} cy={nurse.y} r="8" fill="#FFFFFF" stroke={GUESS} strokeWidth={weight("nurse", 2.5)} />
-                <circle cx={nurse.x} cy={nurse.y} r="3" fill={GUESS} />
-                <text x={nurse.x} y={nurse.y - 14} fill={INK} fontSize="11" textAnchor="middle" style={labelStyle}>nurse</text>
+                <circle cx={nurse.x} cy={nurse.y} r="8" fill="#FFFFFF" stroke={NURSE_RING} strokeWidth={weight("nurse", 2.5)} />
+                <circle cx={nurse.x} cy={nurse.y} r="3" fill={NURSE_RING} />
+                <text x={nurse.x} y={nurse.y - 14} fill={NURSE_TEXT} fontSize="11" fontWeight={600} textAnchor="middle" style={labelStyle}>nurse</text>
             </g>
         </svg>
     );
@@ -547,7 +552,7 @@ export const searchingBlindBlocks: ReactElement[] = [
     <StackLayout key="layout-blind-search-setup" maxWidth="xl">
         <Block id="blind-search-setup" padding="sm">
             <EditableParagraph id="para-blind-search-setup" blockId="blind-search-setup">
-                Put yourself in the robot's position. You know your own square and the nurse's, but you cannot
+                Put yourself in the <RobotWord>robot's</RobotWord> position. You know your own square and the <NurseWord>nurse's</NurseWord>, but you cannot
                 see the walls until you reach them. With no sense of which way to head, the only safe move is to
                 check the nearest unchecked square, then the next nearest, outwards.
             </EditableParagraph>
@@ -566,7 +571,7 @@ export const searchingBlindBlocks: ReactElement[] = [
                 >
                     indigo edge
                 </InlineLinkedHighlight>{" "}
-                of the shaded area and pull it outwards, ring by ring, until the search first touches the nurse.
+                of the shaded area and pull it outwards, ring by ring, until the search first touches the <NurseWord />.
                 The number printed on each square is its{" "}
                 <InlineSpotColor varName="blindSearchStep" {...spotColorPropsFromDefinition(getVariableInfo('blindSearchStep'))}>
                     distance from the robot
@@ -593,7 +598,7 @@ export const searchingBlindBlocks: ReactElement[] = [
                     varName="blindSearchStep"
                     {...numberPropsFromDefinition(getVariableInfo('blindSearchStep'))}
                 />{" "}
-                steps out from the robot, and to get there it has checked <BlindSearchCheckedCount /> squares.
+                steps out from the <RobotWord />, and to get there it has checked <BlindSearchCheckedCount /> squares.
                 Drag that number and both pictures follow it.
             </EditableParagraph>
         </Block>
@@ -619,7 +624,7 @@ export const searchingBlindBlocks: ReactElement[] = [
                 >
                     shaded squares
                 </InlineLinkedHighlight>{" "}
-                was chosen for being close to the robot instead. That pile of checked squares is exactly what A*
+                was chosen for being close to the <RobotWord /> instead. That pile of checked squares is exactly what A*
                 is going to save.
             </EditableParagraph>
         </Block>
@@ -628,7 +633,7 @@ export const searchingBlindBlocks: ReactElement[] = [
     <StackLayout key="layout-blind-search-question-order" maxWidth="xl">
         <Block id="blind-search-question-order" padding="md">
             <EditableParagraph id="para-blind-search-question-order" blockId="blind-search-question-order">
-                So, with no idea which way the nurse lies, this search works through the squares in order of
+                So, with no idea which way the <NurseWord /> lies, this search works through the squares in order of
                 their distance from{" "}
                 <InlineFeedback
                     varName="answer_blind_search_order"
@@ -670,7 +675,7 @@ export const searchingBlindBlocks: ReactElement[] = [
         <Block id="blind-search-question-count" padding="md">
             <EditableParagraph id="para-blind-search-question-count" blockId="blind-search-question-count">
                 <RevealOnInteraction varName="blindSearchExplored">
-                    Now wind the search all the way out, until the shading first touches the nurse. Her route
+                    Now wind the search all the way out, until the shading first touches the <NurseWord />. Her route
                     turns out to be 17 steps long, and the number of squares checked to find it is{" "}
                     <InlineFeedback
                         varName="answer_blind_search_count"

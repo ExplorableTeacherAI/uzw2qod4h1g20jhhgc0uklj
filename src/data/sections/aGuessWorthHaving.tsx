@@ -7,18 +7,37 @@ import {
     InlineClozeChoice,
     InlineClozeInput,
     InlineFeedback,
+    InlineFormula,
     InlineLinkedHighlight,
+    InlineSpotColor,
     InlineTooltip,
+    InlineTrigger,
     InteractionHintSequence,
     RevealOnInteraction,
 } from "@/components/atoms";
 import { Figure } from "@/components/molecules";
-import { useSetVar, useVar } from "@/stores";
+import { useSetVar, useVar, useVariableStore } from "@/stores";
+import { useRafLoop } from "@/lib/motion";
+import {
+    ANSWER,
+    ANSWER_BG,
+    EASE_150,
+    FORMULA_COLORS,
+    GUESS,
+    GUESS_TEXT,
+    INK,
+    INK_QUIET,
+    LABEL_OUTLINE,
+    WALKED,
+    WALKED_TEXT,
+    WALL_FILL,
+} from "./lessonPalette";
 import {
     choicePropsFromDefinition,
     clozePropsFromDefinition,
     getVariableInfo,
     linkedHighlightPropsFromDefinition,
+    spotColorPropsFromDefinition,
 } from "../variables";
 
 // ── The floor plan model ─────────────────────────────────────────────────────
@@ -57,14 +76,8 @@ const CELL = 26;
 const GRID_X = 24;
 const GRID_Y = 52;
 
-const INK = "#334155";
-const INK_QUIET = "#CBD5E1";
-const GUESS_INK = "#94A3B8";
-const WALL_FILL = "#475569";
-const ACCENT = "#62D0AD";
-const ATTENTION = "#F7B23B";
-
-const EASE_150 = { transition: "opacity 150ms ease, stroke-width 150ms ease, fill-opacity 150ms ease" } as const;
+/** Seconds between steps when the robot walks by itself. */
+const AUTO_WALK_PERIOD = 0.45;
 
 const formatGuess = (value: number) => `guess from here: ${value}`;
 const formatSteps = (value: number) => `steps taken: ${value}`;
@@ -134,12 +147,7 @@ function GuessWalkDrawing({
     }
     const trailKey = new Set(trail.map(([c, r]) => `${c},${r}`));
     const trailPath = trail.map(([c, r], index) => `${index === 0 ? "M" : "L"} ${centreX(c)} ${centreY(r)}`).join(" ");
-    const labelStyle = {
-        paintOrder: "stroke",
-        stroke: "#FFFFFF",
-        strokeWidth: 3,
-        strokeLinejoin: "round",
-    } as React.CSSProperties;
+    const labelStyle = LABEL_OUTLINE as React.CSSProperties;
 
     return (
         <svg
@@ -158,10 +166,10 @@ function GuessWalkDrawing({
             </defs>
 
             <g fontSize="12" style={{ fontVariantNumeric: "tabular-nums", ...EASE_150 }}>
-                <text x="24" y="32" fill={ACCENT} opacity={opacity("guesses")}>
+                <text x="24" y="32" fill={GUESS_TEXT} fontWeight={600} opacity={opacity("guesses")}>
                     {formatGuess(currentGuess)}
                 </text>
-                <text x={VIEW_WIDTH - 24} y="32" fill={INK} textAnchor="end" opacity={opacity("moves")}>
+                <text x={VIEW_WIDTH - 24} y="32" fill={WALKED_TEXT} textAnchor="end" opacity={opacity("trail")}>
                     {formatSteps(trail.length - 1)}
                 </text>
             </g>
@@ -184,7 +192,7 @@ function GuessWalkDrawing({
                 )}
             </g>
 
-            {/* THE GUESSES — one number per open square, walls ignored. */}
+            {/* THE GUESSES — one amber number per open square, walls ignored. */}
             <g
                 {...hoverProps("guesses")}
                 opacity={opacity("guesses")}
@@ -196,17 +204,17 @@ function GuessWalkDrawing({
                     <text
                         key={`guess-${c}-${r}`}
                         x={centreX(c)}
-                        y={centreY(r) + 3}
-                        fill={isActive("guesses") ? INK : GUESS_INK}
-                        fontWeight={isActive("guesses") ? 600 : 400}
+                        y={centreY(r) + 3.5}
+                        fill={isActive("guesses") ? GUESS_TEXT : "#D9A441"}
+                        fontWeight={isActive("guesses") ? 700 : 500}
                     >
                         {guessAt(c, r)}
                     </text>
                 ))}
             </g>
 
-            {/* The walk so far — where the robot has already been. */}
-            <g opacity={opacity("__structure")} style={EASE_150}>
+            {/* THE WALK SO FAR — indigo, the colour of steps walked from the start. */}
+            <g {...hoverProps("trail")} opacity={opacity("trail")} style={EASE_150}>
                 {trail.map(([c, r]) => (
                     <rect
                         key={`trail-${c}-${r}`}
@@ -214,17 +222,22 @@ function GuessWalkDrawing({
                         y={cellY(r)}
                         width={CELL}
                         height={CELL}
-                        fill={ACCENT}
-                        fillOpacity={0.16}
+                        fill={WALKED}
+                        fillOpacity={isActive("trail") ? 0.32 : 0.16}
                         stroke="none"
                     />
                 ))}
                 {trail.length > 1 && (
-                    <path d={trailPath} fill="none" stroke={ACCENT} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+                    <>
+                        <Halo active={isActive("trail")}>
+                            <path d={trailPath} fill="none" stroke={WALKED} strokeWidth={weight("trail", 3) + 6} strokeLinecap="round" strokeLinejoin="round" />
+                        </Halo>
+                        <path d={trailPath} fill="none" stroke={WALKED} strokeWidth={weight("trail", 3)} strokeLinecap="round" strokeLinejoin="round" />
+                    </>
                 )}
             </g>
 
-            {/* THE MOVES ON OFFER — the squares one step away, best guess ringed. */}
+            {/* THE MOVES ON OFFER — the squares one step away, smallest guess ringed in amber. */}
             <g {...hoverProps("moves")} opacity={opacity("moves")} style={EASE_150}>
                 {options.map(([c, r]) => {
                     const best = guessAt(c, r) === bestGuess;
@@ -237,7 +250,7 @@ function GuessWalkDrawing({
                                     width={CELL}
                                     height={CELL}
                                     fill="none"
-                                    stroke={ACCENT}
+                                    stroke={GUESS}
                                     strokeWidth={weight("moves", 2.5) + 6}
                                 />
                             </Halo>
@@ -246,9 +259,9 @@ function GuessWalkDrawing({
                                 y={cellY(r)}
                                 width={CELL}
                                 height={CELL}
-                                fill={ACCENT}
-                                fillOpacity={best && !trailKey.has(`${c},${r}`) ? 0.22 : 0.06}
-                                stroke={ACCENT}
+                                fill={GUESS}
+                                fillOpacity={best && !trailKey.has(`${c},${r}`) ? 0.24 : 0.06}
+                                stroke={GUESS}
                                 strokeWidth={best ? weight("moves", 2.5) : 1.5}
                                 strokeDasharray={best ? undefined : "3 3"}
                             />
@@ -260,8 +273,8 @@ function GuessWalkDrawing({
             {/* The two people, drawn last so nothing buries them. */}
             <g opacity={opacity("__structure")} style={EASE_150}>
                 <circle cx={centreX(col)} cy={centreY(row)} r="8" fill={INK} filter="url(#guess-walk-shadow)" />
-                <circle cx={centreX(NURSE[0])} cy={centreY(NURSE[1])} r="8" fill="#FFFFFF" stroke={INK} strokeWidth="2.5" />
-                <circle cx={centreX(NURSE[0])} cy={centreY(NURSE[1])} r="3" fill={INK} />
+                <circle cx={centreX(NURSE[0])} cy={centreY(NURSE[1])} r="8" fill="#FFFFFF" stroke={GUESS} strokeWidth="2.5" />
+                <circle cx={centreX(NURSE[0])} cy={centreY(NURSE[1])} r="3" fill={GUESS} />
                 <g fill={INK} fontSize="11" textAnchor="middle" style={labelStyle}>
                     <text x={centreX(col)} y={centreY(row) - 14}>robot</text>
                     <text x={centreX(NURSE[0])} y={centreY(NURSE[1]) - 14}>nurse</text>
@@ -272,12 +285,13 @@ function GuessWalkDrawing({
                 x={VIEW_WIDTH / 2}
                 y={VIEW_HEIGHT - 12}
                 fontSize="12"
+                fontWeight={600}
                 textAnchor="middle"
-                fill={reached ? INK : ATTENTION}
+                fill={reached ? INK : GUESS_TEXT}
                 opacity={stuck || reached ? 1 : 0}
                 style={EASE_150}
             >
-                {reached ? "The robot is standing with the nurse." : "No neighbour has a smaller guess."}
+                {reached ? "The robot is standing with the nurse." : "Stuck: no neighbour has a smaller guess."}
             </text>
         </svg>
     );
@@ -289,45 +303,88 @@ function GuessWalkFigure() {
     const setVar = useSetVar();
     const storedCol = useVar<number>("guessWalkCol", START[0]);
     const storedRow = useVar<number>("guessWalkRow", START[1]);
+    const playing = useVar<boolean>("guessWalkPlaying", false);
     const [trail, setTrail] = useState<[number, number][]>([START]);
+    // The store re-renders synchronously, before React applies setTrail, so the
+    // trail is mirrored in a ref and moves made here are flagged so the
+    // "set from outside" effect below leaves them alone.
+    const trailRef = useRef(trail);
+    const ownMoveRef = useRef(false);
+    const sinceLastStep = useRef(0);
 
     // If the position is set from outside (a reset, or a feedback hint), the
     // trail starts again from wherever it was put.
     useEffect(() => {
-        const [col, row] = trail[trail.length - 1];
-        if (storedCol !== col || storedRow !== row) {
-            setTrail([[storedCol, storedRow]]);
+        if (ownMoveRef.current) {
+            ownMoveRef.current = false;
+            return;
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+        const [col, row] = trailRef.current[trailRef.current.length - 1];
+        if (storedCol !== col || storedRow !== row) {
+            const fresh: [number, number][] = [[storedCol, storedRow]];
+            trailRef.current = fresh;
+            setTrail(fresh);
+        }
     }, [storedCol, storedRow]);
 
     const stepTo = (col: number, row: number) => {
-        setTrail((previous) => {
-            const withoutLast = previous.slice(0, -1);
-            const stepsBack =
-                withoutLast.length > 0 &&
-                withoutLast[withoutLast.length - 1][0] === col &&
-                withoutLast[withoutLast.length - 1][1] === row;
-            const next: [number, number][] = stepsBack ? withoutLast : [...previous, [col, row]];
-            setVar("guessWalkSteps", next.length - 1);
-            return next;
-        });
+        const previous = trailRef.current;
+        const withoutLast = previous.slice(0, -1);
+        const stepsBack =
+            withoutLast.length > 0 &&
+            withoutLast[withoutLast.length - 1][0] === col &&
+            withoutLast[withoutLast.length - 1][1] === row;
+        const next: [number, number][] = stepsBack ? withoutLast : [...previous, [col, row]];
+        trailRef.current = next;
+        ownMoveRef.current = true;
+        setTrail(next);
+        setVar("guessWalkSteps", next.length - 1);
         setVar("guessWalkCol", col);
         setVar("guessWalkRow", row);
         setVar("guessWalkExplored", true);
     };
 
+    // Play: the robot walks by itself, always onto the unvisited neighbour with
+    // the smallest guess, and stops the moment no neighbour beats where it stands.
+    useRafLoop(
+        (dt) => {
+            sinceLastStep.current += dt;
+            if (sinceLastStep.current < AUTO_WALK_PERIOD) return;
+            sinceLastStep.current = 0;
+            const current = trailRef.current;
+            const [col, row] = current[current.length - 1];
+            const visited = new Set(current.map(([c, r]) => `${c},${r}`));
+            const candidates = neighboursOf(col, row).filter(([c, r]) => !visited.has(`${c},${r}`));
+            const best = candidates.reduce<[number, number] | null>(
+                (bestSoFar, next) => (!bestSoFar || guessAt(next[0], next[1]) < guessAt(bestSoFar[0], bestSoFar[1]) ? next : bestSoFar),
+                null,
+            );
+            const reached = col === NURSE[0] && row === NURSE[1];
+            if (reached || !best || guessAt(best[0], best[1]) >= guessAt(col, row)) {
+                setVar("guessWalkPlaying", false);
+                return;
+            }
+            stepTo(best[0], best[1]);
+        },
+        { paused: !playing },
+    );
+
     return (
         <Figure
             id="heuristic-guess-walk"
+            playable
+            playVarName="guessWalkPlaying"
             onReset={() => {
+                trailRef.current = [START];
                 setTrail([START]);
+                sinceLastStep.current = 0;
+                setVar("guessWalkPlaying", false);
                 setVar("guessWalkCol", START[0]);
                 setVar("guessWalkRow", START[1]);
                 setVar("guessWalkSteps", 0);
                 setVar("guessWalkHighlight", "");
             }}
-            caption="Every open square shows its guess. Click a neighbouring square to step onto it, and click the square behind you to take a step back."
+            caption="Every open square shows its amber guess. Click a neighbouring square to step onto it (click the square behind you to step back), or press play and the robot walks by itself, always onto the smallest guess."
         >
             <GuessWalkDrawing trail={trail} onStepTo={stepTo} />
             <InteractionHintSequence
@@ -341,6 +398,37 @@ function GuessWalkFigure() {
                 ]}
             />
         </Figure>
+    );
+}
+
+/** The guess for wherever the robot stands right now, worked in the open. */
+function GuessWalkLiveGuess() {
+    const col = useVar<number>("guessWalkCol", START[0]);
+    const row = useVar<number>("guessWalkRow", START[1]);
+    const across = Math.abs(col - NURSE[0]);
+    const up = Math.abs(row - NURSE[1]);
+    return (
+        <>
+            <InlineSpotColor varName="astarNextH" {...spotColorPropsFromDefinition(getVariableInfo('astarNextH'))}>
+                {`${across} ${across === 1 ? "column" : "columns"}`}
+            </InlineSpotColor>{" "}
+            and{" "}
+            <InlineSpotColor varName="astarNextH" {...spotColorPropsFromDefinition(getVariableInfo('astarNextH'))}>
+                {`${up} ${up === 1 ? "row" : "rows"}`}
+            </InlineSpotColor>{" "}
+            from the nurse, so its guess is{" "}
+            <InlineFormula latex={`\\clr{h}{h} = ${across} + ${up} = \\clr{h}{${across + up}}`} colorMap={FORMULA_COLORS} />
+        </>
+    );
+}
+
+/** Steps walked so far, in the walked-distance colour. */
+function GuessWalkLiveSteps() {
+    const steps = useVar<number>("guessWalkSteps", 0);
+    return (
+        <InlineSpotColor varName="guessWalkSteps" {...spotColorPropsFromDefinition(getVariableInfo('guessWalkSteps'))}>
+            {`${steps} ${steps === 1 ? "step" : "steps"}`}
+        </InlineSpotColor>
     );
 }
 
@@ -360,7 +448,8 @@ export const aGuessWorthHavingBlocks: ReactElement[] = [
             <EditableParagraph id="para-heuristic-worked-example" blockId="heuristic-worked-example">
                 The robot does know one thing it was not using: where the nurse is. Even with walls in the way it
                 can guess the distance left by counting squares as if the floor were empty, across and then up.
-                From four columns and three rows away, that guess is 4 + 3 = 7.
+                From four columns and three rows away, that guess is{" "}
+                <InlineFormula latex="\clr{h}{h} = 4 + 3 = \clr{h}{7}" colorMap={FORMULA_COLORS} />.
             </EditableParagraph>
         </Block>
     </StackLayout>,
@@ -371,6 +460,8 @@ export const aGuessWorthHavingBlocks: ReactElement[] = [
                 That number is called a{" "}
                 <InlineTooltip
                     id="tooltip-heuristic-definition"
+                    color={ANSWER}
+                    bgColor={ANSWER_BG}
                     tooltip="A cheap estimate of the distance still to travel, worked out without looking at the walls. It must never overshoot the true remaining distance."
                 >
                     heuristic
@@ -384,7 +475,17 @@ export const aGuessWorthHavingBlocks: ReactElement[] = [
                     {...linkedHighlightPropsFromDefinition(getVariableInfo('guessWalkHighlight'))}
                 >
                     smallest guess
-                </InlineLinkedHighlight>.
+                </InlineLinkedHighlight>
+                , and watch your{" "}
+                <InlineLinkedHighlight
+                    varName="guessWalkHighlight"
+                    highlightId="trail"
+                    color={WALKED}
+                    bgColor="rgba(142, 144, 245, 0.22)"
+                >
+                    trail
+                </InlineLinkedHighlight>{" "}
+                grow behind you.
             </EditableParagraph>
         </Block>
     </StackLayout>,
@@ -392,6 +493,30 @@ export const aGuessWorthHavingBlocks: ReactElement[] = [
     <StackLayout key="layout-heuristic-walk" maxWidth="xl">
         <Block id="heuristic-visual" padding="sm" hasVisualization>
             <GuessWalkFigure />
+        </Block>
+    </StackLayout>,
+
+    <StackLayout key="layout-heuristic-live" maxWidth="xl">
+        <Block id="heuristic-live" padding="sm">
+            <EditableParagraph id="para-heuristic-live" blockId="heuristic-live">
+                The robot now stands <GuessWalkLiveGuess />, having walked <GuessWalkLiveSteps /> to get there. When
+                you have seen it stuck, you can{" "}
+                <InlineTrigger
+                    varName="guessWalkCol"
+                    value={START[0]}
+                    icon="refresh"
+                    onTrigger={() =>
+                        useVariableStore.getState().setVariables({
+                            guessWalkRow: START[1],
+                            guessWalkSteps: 0,
+                            guessWalkPlaying: false,
+                        })
+                    }
+                >
+                    put it back at the start
+                </InlineTrigger>{" "}
+                and try a different route.
+            </EditableParagraph>
         </Block>
     </StackLayout>,
 
@@ -407,7 +532,15 @@ export const aGuessWorthHavingBlocks: ReactElement[] = [
                 </InlineLinkedHighlight>{" "}
                 pulls hard towards the nurse, and then a wall it knows nothing about leaves every neighbour
                 looking worse than where you stand. So the guess alone is not enough, and ignoring it wastes half
-                the search. A* keeps both halves.
+                the search. A* keeps both halves: the{" "}
+                <InlineSpotColor varName="guessWalkSteps" {...spotColorPropsFromDefinition(getVariableInfo('guessWalkSteps'))}>
+                    steps walked
+                </InlineSpotColor>{" "}
+                from the previous section and the{" "}
+                <InlineSpotColor varName="astarNextH" {...spotColorPropsFromDefinition(getVariableInfo('astarNextH'))}>
+                    guess
+                </InlineSpotColor>{" "}
+                from this one.
             </EditableParagraph>
         </Block>
     </StackLayout>,

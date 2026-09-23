@@ -73,6 +73,7 @@ export const CHECKED_COUNTS: number[] = Array.from({ length: ROUTE_LENGTH + 1 },
 );
 export const BLIND_CHECKED = CHECKED_COUNTS[ROUTE_LENGTH];
 
+
 /** Lexicographic "is a before b" over the ranking tuple. */
 const rankLess = (a: number[], b: number[]) => {
     for (let index = 0; index < a.length; index += 1) {
@@ -81,6 +82,22 @@ const rankLess = (a: number[], b: number[]) => {
     return false;
 };
 
+/** One square on offer to A*, with the two halves of its score. */
+export interface ScoredCell {
+    cell: [number, number];
+    g: number;
+    h: number;
+    f: number;
+}
+
+/** What A* could see at the moment it made one choice. */
+export interface AStarSnapshot {
+    /** The square it picks: smallest f, ties settled on the smaller guess. */
+    pick: ScoredCell;
+    /** Every square on offer at that moment, the pick included. */
+    open: ScoredCell[];
+}
+
 /** A*: always take the smallest f = g + h next, settling ties on the smaller guess. */
 const runAStar = () => {
     const key = (col: number, row: number) => `${col},${row}`;
@@ -88,37 +105,43 @@ const runAStar = () => {
     const cameFrom = new Map<string, [number, number]>();
     const open = new Map<string, [number, number]>([[key(...ROBOT), ROBOT]]);
     const expanded: [number, number][] = [];
+    const trace: AStarSnapshot[] = [];
 
     while (open.size > 0) {
-        let best: [number, number] | null = null;
+        let best: ScoredCell | null = null;
         let bestRank: number[] | null = null;
+        const offered: ScoredCell[] = [];
         for (const [cellKey, cell] of open) {
             const g = cost.get(cellKey) ?? Number.POSITIVE_INFINITY;
             const h = guessAt(cell[0], cell[1]);
+            const scored: ScoredCell = { cell, g, h, f: g + h };
+            offered.push(scored);
             const rank = [g + h, h, cell[1], cell[0]];
             if (!bestRank || rankLess(rank, bestRank)) {
-                best = cell;
+                best = scored;
                 bestRank = rank;
             }
         }
-        if (!best || !bestRank) break;
-        open.delete(key(best[0], best[1]));
-        expanded.push(best);
-        if (best[0] === NURSE[0] && best[1] === NURSE[1]) break;
-        const nextCost = (cost.get(key(best[0], best[1])) ?? 0) + 1;
+        if (!best) break;
+        trace.push({ pick: best, open: offered });
+        const [col, row] = best.cell;
+        open.delete(key(col, row));
+        expanded.push(best.cell);
+        if (col === NURSE[0] && row === NURSE[1]) break;
+        const nextCost = best.g + 1;
         for (const [dx, dy] of STEPS) {
-            const nextCol = best[0] + dx;
-            const nextRow = best[1] + dy;
+            const nextCol = col + dx;
+            const nextRow = row + dy;
             if (!inGrid(nextCol, nextRow) || isWall(nextCol, nextRow)) continue;
             const nextKey = key(nextCol, nextRow);
             if (nextCost < (cost.get(nextKey) ?? Number.POSITIVE_INFINITY)) {
                 cost.set(nextKey, nextCost);
-                cameFrom.set(nextKey, best);
+                cameFrom.set(nextKey, best.cell);
                 open.set(nextKey, [nextCol, nextRow]);
             }
         }
     }
-    return { expanded, path: tracePath(cameFrom) };
+    return { expanded, trace, path: tracePath(cameFrom) };
 };
 
 const aStar = runAStar();
@@ -126,3 +149,5 @@ const aStar = runAStar();
 export const ASTAR_EXPANDED = aStar.expanded;
 export const ASTAR_CHECKED = aStar.expanded.length;
 export const ASTAR_ROUTE = aStar.path;
+/** One snapshot per square A* checked, in the order it checked them. */
+export const ASTAR_TRACE = aStar.trace;

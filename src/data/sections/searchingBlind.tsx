@@ -8,12 +8,25 @@ import {
     InlineClozeInput,
     InlineFeedback,
     InlineLinkedHighlight,
+    InlineScrubbleNumber,
+    InlineSpotColor,
     InteractionHintSequence,
     RevealOnInteraction,
 } from "@/components/atoms";
 import { Figure, FigureSlider } from "@/components/molecules";
 import { useSetVar, useVar } from "@/stores";
 import { clamp, remap, useSpring } from "@/lib/motion";
+import {
+    EASE_150,
+    GUESS,
+    INK,
+    INK_QUIET,
+    INK_STRUCTURE,
+    LABEL_OUTLINE,
+    WALKED,
+    WALKED_TEXT,
+    WALL_FILL,
+} from "./lessonPalette";
 import {
     CHECKED_COUNTS,
     DISTANCES,
@@ -30,6 +43,7 @@ import {
     getVariableInfo,
     linkedHighlightPropsFromDefinition,
     numberPropsFromDefinition,
+    spotColorPropsFromDefinition,
 } from "../variables";
 
 const MAX_COUNT_AXIS = 100;
@@ -48,14 +62,8 @@ const PLOT_RIGHT = 362;
 const PLOT_TOP = 72;
 const PLOT_BOTTOM = 256;
 
-const INK = "#334155";
-const INK_STRUCTURE = "#64748B";
-const INK_QUIET = "#CBD5E1";
-const WALL_FILL = "#475569";
-const CHECKED_FILL = "#64748B";
-const ACCENT = "#62D0AD";
-
-const EASE_150 = { transition: "opacity 150ms ease, stroke-width 150ms ease, fill-opacity 150ms ease" } as const;
+// The blind search orders by g — steps walked from the robot — so it is indigo throughout.
+const ACCENT = WALKED;
 
 // One formatter per quantity, called by BOTH views.
 const formatChecked = (count: number) => `${count} squares checked`;
@@ -87,10 +95,10 @@ function SharedReadouts({ step }: { step: number }) {
     const { opacity } = useHighlightState();
     return (
         <g fontSize="12" style={{ fontVariantNumeric: "tabular-nums", ...EASE_150 }}>
-            <text x="24" y="32" fill={ACCENT} opacity={opacity("checked")}>
+            <text x="24" y="32" fill={WALKED_TEXT} opacity={opacity("checked")}>
                 {formatChecked(checkedAt(step))}
             </text>
-            <text x={VIEW_WIDTH - 24} y="32" fill={INK} textAnchor="end" opacity={opacity("frontier")}>
+            <text x={VIEW_WIDTH - 24} y="32" fill={WALKED_TEXT} fontWeight={600} textAnchor="end" opacity={opacity("frontier")}>
                 {formatStep(step)}
             </text>
         </g>
@@ -141,12 +149,7 @@ function FloorPlanDrawing() {
     });
     const robot = markerCenter(ROBOT);
     const nurse = markerCenter(NURSE);
-    const labelStyle = {
-        paintOrder: "stroke",
-        stroke: "#FFFFFF",
-        strokeWidth: 3,
-        strokeLinejoin: "round",
-    } as React.CSSProperties;
+    const labelStyle = LABEL_OUTLINE as React.CSSProperties;
 
     return (
         <svg
@@ -154,7 +157,7 @@ function FloorPlanDrawing() {
             viewBox={`0 0 ${VIEW_WIDTH} ${VIEW_HEIGHT}`}
             className="block w-full select-none"
             role="img"
-            aria-label="Hospital floor grid; the squares the search has checked are shaded, with a draggable teal edge"
+            aria-label="Hospital floor grid; each square the search has checked shows its distance from the robot, with a draggable indigo edge"
             style={{ cursor: dragging ? "grabbing" : "grab", touchAction: "none" }}
             onPointerDown={(event) => {
                 event.currentTarget.setPointerCapture(event.pointerId);
@@ -199,7 +202,9 @@ function FloorPlanDrawing() {
                 ))}
             </g>
 
-            {/* CHECKED squares — counterpart of the shaded area under the graph. */}
+            {/* CHECKED squares — counterpart of the shaded area under the graph.
+                Each one carries g, its distance from the robot: the number the
+                blind search ordered it by. */}
             <g {...hoverProps("checked")} opacity={opacity("checked")} style={EASE_150}>
                 {checkedCells.map((cell) => (
                     <rect
@@ -208,12 +213,25 @@ function FloorPlanDrawing() {
                         y={cellY(cell.row)}
                         width={CELL}
                         height={CELL}
-                        fill={CHECKED_FILL}
-                        fillOpacity={isActive("checked") ? 0.38 : 0.18}
+                        fill={ACCENT}
+                        fillOpacity={isActive("checked") ? 0.3 : 0.12}
                         stroke={INK_QUIET}
                         strokeWidth="1"
                     />
                 ))}
+                <g
+                    fontSize="10"
+                    textAnchor="middle"
+                    fill={isActive("checked") ? WALKED_TEXT : "#94A3B8"}
+                    fontWeight={isActive("checked") ? 600 : 400}
+                    style={{ fontVariantNumeric: "tabular-nums", ...EASE_150 }}
+                >
+                    {checkedCells.map((cell) => (
+                        <text key={`distance-${cell.col}-${cell.row}`} x={cellX(cell.col) + CELL / 2} y={cellY(cell.row) + CELL / 2 + 3.5}>
+                            {cell.distance}
+                        </text>
+                    ))}
+                </g>
             </g>
 
             {/* THE FRONTIER — the teal edge the student drags, and the graph's dot. */}
@@ -245,17 +263,34 @@ function FloorPlanDrawing() {
                         strokeWidth={weight("frontier", 2.5)}
                     />
                 ))}
+                <g
+                    fontSize="10"
+                    fontWeight={600}
+                    textAnchor="middle"
+                    fill={WALKED_TEXT}
+                    style={{ fontVariantNumeric: "tabular-nums" }}
+                >
+                    {frontierCells.map((cell) => (
+                        <text key={`frontier-distance-${cell.col}-${cell.row}`} x={cellX(cell.col) + CELL / 2} y={cellY(cell.row) + CELL / 2 + 3.5}>
+                            {cell.distance}
+                        </text>
+                    ))}
+                </g>
             </g>
 
-            {/* The two people, drawn last so the shading never buries them. */}
+            {/* The two people, drawn last so the shading never buries them. The
+                nurse is amber — the goal colour — because this search never looks at her. */}
             <g opacity={opacity("__structure")} style={EASE_150}>
                 <circle cx={robot.x} cy={robot.y} r="8" fill={INK} filter="url(#blind-search-marker-shadow)" />
-                <circle cx={nurse.x} cy={nurse.y} r="8" fill="#FFFFFF" stroke={INK} strokeWidth="2.5" />
-                <circle cx={nurse.x} cy={nurse.y} r="3" fill={INK} />
-                <g fill={INK} fontSize="11" textAnchor="middle" style={labelStyle}>
-                    <text x={robot.x} y={robot.y - 14}>robot</text>
-                    <text x={nurse.x} y={nurse.y - 14}>nurse</text>
-                </g>
+                <text x={robot.x} y={robot.y - 14} fill={INK} fontSize="11" textAnchor="middle" style={labelStyle}>robot</text>
+            </g>
+            <g {...hoverProps("nurse")} opacity={opacity("nurse")} style={EASE_150}>
+                <Halo active={isActive("nurse")}>
+                    <circle cx={nurse.x} cy={nurse.y} r="8" fill="none" stroke={GUESS} strokeWidth={weight("nurse", 2.5) + 6} />
+                </Halo>
+                <circle cx={nurse.x} cy={nurse.y} r="8" fill="#FFFFFF" stroke={GUESS} strokeWidth={weight("nurse", 2.5)} />
+                <circle cx={nurse.x} cy={nurse.y} r="3" fill={GUESS} />
+                <text x={nurse.x} y={nurse.y - 14} fill={INK} fontSize="11" textAnchor="middle" style={labelStyle}>nurse</text>
             </g>
         </svg>
     );
@@ -435,7 +470,7 @@ function FloorPlanFigure() {
                 setVar("blindSearchStep", DEFAULT_STEP);
                 setVar("blindSearchHighlight", "");
             }}
-            caption="The robot's floor. Drag the teal edge outwards and the shaded squares are the ones the search has been through."
+            caption="The robot's floor. Drag the indigo edge outwards: every square the search has been through is shaded and carries its distance from the robot."
         >
             <FloorPlanDrawing />
             <InteractionHintSequence
@@ -443,7 +478,7 @@ function FloorPlanFigure() {
                 steps={[
                     {
                         gesture: "drag",
-                        label: "Drag the teal edge outwards, ring by ring",
+                        label: "Drag the indigo edge outwards, ring by ring",
                         position: { x: "43%", y: "55%" },
                         dragPath: { type: "line", startOffset: { x: -22, y: 0 }, endOffset: { x: 30, y: 0 } },
                     },
@@ -488,6 +523,16 @@ function CheckedCountFigure() {
     );
 }
 
+/** The running total, in prose, through the same formatter as the figures. */
+function BlindSearchCheckedCount() {
+    const step = useVar<number>("blindSearchStep", DEFAULT_STEP);
+    return (
+        <InlineSpotColor varName="blindSearchStep" {...spotColorPropsFromDefinition(getVariableInfo('blindSearchStep'))}>
+            {String(checkedAt(step))}
+        </InlineSpotColor>
+    );
+}
+
 // ── Blocks ───────────────────────────────────────────────────────────────────
 
 export const searchingBlindBlocks: ReactElement[] = [
@@ -519,9 +564,14 @@ export const searchingBlindBlocks: ReactElement[] = [
                     highlightId="frontier"
                     {...linkedHighlightPropsFromDefinition(getVariableInfo('blindSearchHighlight'))}
                 >
-                    teal edge
+                    indigo edge
                 </InlineLinkedHighlight>{" "}
                 of the shaded area and pull it outwards, ring by ring, until the search first touches the nurse.
+                The number printed on each square is its{" "}
+                <InlineSpotColor varName="blindSearchStep" {...spotColorPropsFromDefinition(getVariableInfo('blindSearchStep'))}>
+                    distance from the robot
+                </InlineSpotColor>
+                , and that number is the only thing the search ever looks at.
             </EditableParagraph>
         </Block>
     </StackLayout>,
@@ -535,11 +585,33 @@ export const searchingBlindBlocks: ReactElement[] = [
         </Block>
     </SplitLayout>,
 
+    <StackLayout key="layout-blind-search-live" maxWidth="xl">
+        <Block id="blind-search-live" padding="sm">
+            <EditableParagraph id="para-blind-search-live" blockId="blind-search-live">
+                Right now the search has spread{" "}
+                <InlineScrubbleNumber
+                    varName="blindSearchStep"
+                    {...numberPropsFromDefinition(getVariableInfo('blindSearchStep'))}
+                />{" "}
+                steps out from the robot, and to get there it has checked <BlindSearchCheckedCount /> squares.
+                Drag that number and both pictures follow it.
+            </EditableParagraph>
+        </Block>
+    </StackLayout>,
+
     <StackLayout key="layout-blind-search-gap" maxWidth="xl">
         <Block id="blind-search-gap" padding="sm">
             <EditableParagraph id="para-blind-search-gap" blockId="blind-search-gap">
-                Notice what the search never used: the nurse's position. It knows perfectly well where she is,
-                and every one of those{" "}
+                Notice what the search never used:{" "}
+                <InlineLinkedHighlight
+                    varName="blindSearchHighlight"
+                    highlightId="nurse"
+                    color={GUESS}
+                    bgColor="rgba(247, 178, 59, 0.22)"
+                >
+                    the nurse's position
+                </InlineLinkedHighlight>
+                . It knows perfectly well where she is, and every one of those{" "}
                 <InlineLinkedHighlight
                     varName="blindSearchHighlight"
                     highlightId="checked"
@@ -571,7 +643,7 @@ export const searchingBlindBlocks: ReactElement[] = [
                         steps: [
                             {
                                 gesture: "drag",
-                                label: "Pull the teal edge outwards a few rings — watch which square the shading grows around",
+                                label: "Pull the indigo edge outwards a few rings — watch which square the shading grows around",
                                 position: { x: "43%", y: "55%" },
                                 dragPath: { type: "line", startOffset: { x: -22, y: 0 }, endOffset: { x: 34, y: 0 } },
                                 completionVar: "blindSearchStep",
@@ -613,7 +685,7 @@ export const searchingBlindBlocks: ReactElement[] = [
                             steps: [
                                 {
                                     gesture: "drag",
-                                    label: "Pull the teal edge all the way out until it reaches the nurse",
+                                    label: "Pull the indigo edge all the way out until it reaches the nurse",
                                     position: { x: "43%", y: "55%" },
                                     dragPath: { type: "line", startOffset: { x: -22, y: 0 }, endOffset: { x: 40, y: 0 } },
                                     completionVar: "blindSearchStep",

@@ -81,6 +81,12 @@ export interface VariableDefinition {
  *    { defaultValue: { x: 5, y: 10 }, type: 'object', schema: '{ x: number, y: number }' }
  */
 export const variableDefinitions: Record<string, VariableDefinition> = {
+    // Colour code for the whole lesson (see sections/lessonPalette.ts):
+    //   indigo #8E90F5 = g, steps walked from the robot (the blind search's ordering)
+    //   amber  #F7B23B = h, the guess of steps left to the nurse
+    //   teal   #62D0AD = f = g + h, A*'s score and everything A* does
+    //   blue   #2563EB = student answers and definitions (none of the above)
+
     // ─────────────────────────────────────────
     // SECTION — Searching Blind (linked pair: floor map + count graph)
     // ─────────────────────────────────────────
@@ -88,20 +94,20 @@ export const variableDefinitions: Record<string, VariableDefinition> = {
         defaultValue: 4,
         type: 'number',
         label: 'Steps out from the robot',
-        description: 'How far the blind search has spread from the robot, in steps. Shared by the floor map and the count graph.',
+        description: 'How far the blind search has spread from the robot, in steps. Shared by the floor map, the count graph and the prose.',
         min: 0,
         max: 17,
         step: 1,
-        color: '#62D0AD',
+        color: '#8E90F5',
     },
 
     blindSearchHighlight: {
         defaultValue: '',
         type: 'linkedHighlight',
         label: 'Blind search highlight',
-        description: "Which part is highlighted across both views: '' | 'checked' | 'frontier'",
-        color: '#62D0AD',
-        bgColor: 'rgba(98, 208, 173, 0.22)',
+        description: "Which part is highlighted across both views: '' | 'checked' | 'frontier' | 'nurse'",
+        color: '#8E90F5',
+        bgColor: 'rgba(142, 144, 245, 0.22)',
     },
 
     answer_blind_search_order: {
@@ -112,7 +118,17 @@ export const variableDefinitions: Record<string, VariableDefinition> = {
         placeholder: '???',
         correctAnswer: 'the robot',
         options: ['the robot', 'the nurse', 'the nearest wall'],
-        color: '#8E90F5',
+        color: '#2563EB',
+    },
+
+    answer_blind_search_count: {
+        defaultValue: '',
+        type: 'text',
+        label: 'Blind search checked count answer',
+        description: 'Student answer: how many squares the blind search checked before reaching the nurse',
+        placeholder: '???',
+        correctAnswer: ['92', '92 squares'],
+        color: '#2563EB',
     },
 
     // ─────────────────────────────────────────
@@ -126,7 +142,7 @@ export const variableDefinitions: Record<string, VariableDefinition> = {
         min: 0,
         max: 12,
         step: 1,
-        color: '#62D0AD',
+        color: '#8E90F5',
     },
 
     guessWalkRow: {
@@ -137,7 +153,7 @@ export const variableDefinitions: Record<string, VariableDefinition> = {
         min: 0,
         max: 8,
         step: 1,
-        color: '#62D0AD',
+        color: '#8E90F5',
     },
 
     guessWalkSteps: {
@@ -148,16 +164,23 @@ export const variableDefinitions: Record<string, VariableDefinition> = {
         min: 0,
         max: 60,
         step: 1,
-        color: '#62D0AD',
+        color: '#8E90F5',
+    },
+
+    guessWalkPlaying: {
+        defaultValue: false,
+        type: 'boolean',
+        label: 'Guess walk playing',
+        description: 'Whether the robot is walking by itself, always onto the smallest guess',
     },
 
     guessWalkHighlight: {
         defaultValue: '',
         type: 'linkedHighlight',
         label: 'Guess walk highlight',
-        description: "Which part of the guess map is highlighted: '' | 'guesses' | 'moves'",
-        color: '#62D0AD',
-        bgColor: 'rgba(98, 208, 173, 0.22)',
+        description: "Which part of the guess map is highlighted: '' | 'guesses' | 'moves' | 'trail'",
+        color: '#F7B23B',
+        bgColor: 'rgba(247, 178, 59, 0.22)',
     },
 
     answer_heuristic_value: {
@@ -167,7 +190,7 @@ export const variableDefinitions: Record<string, VariableDefinition> = {
         description: 'Student answer: the guess for a square three columns and five rows from the nurse',
         placeholder: '???',
         correctAnswer: '8',
-        color: '#8E90F5',
+        color: '#2563EB',
     },
 
     answer_heuristic_trap: {
@@ -178,7 +201,7 @@ export const variableDefinitions: Record<string, VariableDefinition> = {
         placeholder: '???',
         correctAnswer: 'the walls in the way',
         options: ['the walls in the way', 'the distance to the nurse', 'the size of the room'],
-        color: '#8E90F5',
+        color: '#2563EB',
     },
 
     // ─────────────────────────────────────────
@@ -211,6 +234,68 @@ export const variableDefinitions: Record<string, VariableDefinition> = {
         bgColor: 'rgba(98, 208, 173, 0.22)',
     },
 
+    // Watching A* choose, one square at a time
+    astarStep: {
+        defaultValue: 20,
+        type: 'number',
+        label: 'Squares A* has checked',
+        description: 'How many squares A* has checked so far in the step-through (0 = about to start, 54 = nurse reached). Shared by the map, its slider, the formula and the prose.',
+        min: 0,
+        max: 54,
+        step: 1,
+        color: '#62D0AD',
+    },
+
+    astarPlaying: {
+        defaultValue: false,
+        type: 'boolean',
+        label: 'A* step-through playing',
+        description: 'Whether the A* step-through is advancing by itself',
+    },
+
+    astarHighlight: {
+        defaultValue: '',
+        type: 'linkedHighlight',
+        label: 'A* step-through highlight',
+        description: "Which part of the step-through is highlighted: '' | 'checked' | 'offered' | 'next'",
+        color: '#62D0AD',
+        bgColor: 'rgba(98, 208, 173, 0.22)',
+    },
+
+    // The score of the square A* is about to check — written by the step-through figure, read by \val{} in the formula and by the prose
+    astarNextG: {
+        defaultValue: 9,
+        type: 'number',
+        label: 'Next pick: steps walked',
+        description: 'g of the square A* picks next: steps walked from the robot to reach it',
+        min: 0,
+        max: 30,
+        step: 1,
+        color: '#8E90F5',
+    },
+
+    astarNextH: {
+        defaultValue: 4,
+        type: 'number',
+        label: 'Next pick: guess',
+        description: 'h of the square A* picks next: the guess of steps still to go to the nurse',
+        min: 0,
+        max: 30,
+        step: 1,
+        color: '#F7B23B',
+    },
+
+    astarNextF: {
+        defaultValue: 13,
+        type: 'number',
+        label: 'Next pick: total',
+        description: 'f = g + h of the square A* picks next',
+        min: 0,
+        max: 60,
+        step: 1,
+        color: '#62D0AD',
+    },
+
     answer_comparison_length: {
         defaultValue: '',
         type: 'select',
@@ -219,7 +304,7 @@ export const variableDefinitions: Record<string, VariableDefinition> = {
         placeholder: '???',
         correctAnswer: 'exactly as long as',
         options: ['exactly as long as', 'shorter than', 'longer than'],
-        color: '#8E90F5',
+        color: '#2563EB',
     },
 
     answer_comparison_checked: {
@@ -229,17 +314,7 @@ export const variableDefinitions: Record<string, VariableDefinition> = {
         description: 'Student answer: how many squares A* checked on this map',
         placeholder: '???',
         correctAnswer: ['54', '54 squares'],
-        color: '#8E90F5',
-    },
-
-    answer_blind_search_count: {
-        defaultValue: '',
-        type: 'text',
-        label: 'Blind search checked count answer',
-        description: 'Student answer: how many squares the blind search checked before reaching the nurse',
-        placeholder: '???',
-        correctAnswer: ['92', '92 squares'],
-        color: '#8E90F5',
+        color: '#2563EB',
     },
 
 

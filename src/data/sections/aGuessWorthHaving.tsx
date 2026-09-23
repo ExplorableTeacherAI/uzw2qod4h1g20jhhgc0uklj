@@ -9,6 +9,7 @@ import {
     InlineFeedback,
     InlineFormula,
     InlineLinkedHighlight,
+    InlineScrubbleNumber,
     InlineSpotColor,
     InlineTooltip,
     InlineTrigger,
@@ -42,6 +43,7 @@ import {
     clozePropsFromDefinition,
     getVariableInfo,
     linkedHighlightPropsFromDefinition,
+    numberPropsFromDefinition,
     spotColorPropsFromDefinition,
 } from "../variables";
 
@@ -406,6 +408,18 @@ function GuessWalkFigure() {
     );
 }
 
+/** The worked example's guess, recomputed from the two scrubbable counts. */
+function GuessExampleFormula() {
+    const across = useVar<number>("guessExampleAcross", 4);
+    const up = useVar<number>("guessExampleUp", 3);
+    return (
+        <InlineFormula
+            latex={`\\clr{h}{h} = \\clr{h}{${across}} + \\clr{h}{${up}} = \\clr{h}{${across + up}}`}
+            colorMap={FORMULA_COLORS}
+        />
+    );
+}
+
 /** The guess for wherever the robot stands right now, worked in the open. */
 function GuessWalkLiveGuess() {
     const col = useVar<number>("guessWalkCol", START[0]);
@@ -443,8 +457,17 @@ export const aGuessWorthHavingBlocks: ReactElement[] = [
             <EditableParagraph id="para-heuristic-worked-example" blockId="heuristic-worked-example">
                 The <RobotWord /> does know one thing it was not using: where the <NurseWord /> is. Even with walls in the way it
                 can guess the distance left by counting squares as if the floor were empty, across and then up.
-                From four columns and three rows away, that guess is{" "}
-                <InlineFormula latex="\clr{h}{h} = \clr{h}{4} + \clr{h}{3} = \clr{h}{7}" colorMap={FORMULA_COLORS} />.
+                From{" "}
+                <InlineScrubbleNumber
+                    varName="guessExampleAcross"
+                    {...numberPropsFromDefinition(getVariableInfo('guessExampleAcross'))}
+                />{" "}
+                columns and{" "}
+                <InlineScrubbleNumber
+                    varName="guessExampleUp"
+                    {...numberPropsFromDefinition(getVariableInfo('guessExampleUp'))}
+                />{" "}
+                rows away, that guess is <GuessExampleFormula />. Drag either number and watch the guess follow.
             </EditableParagraph>
         </Block>
     </StackLayout>,

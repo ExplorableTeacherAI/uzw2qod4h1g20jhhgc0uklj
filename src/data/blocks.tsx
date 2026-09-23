@@ -10,6 +10,7 @@ import { searchingBlindBlocks } from "./sections/searchingBlind";
 import { aGuessWorthHavingBlocks } from "./sections/aGuessWorthHaving";
 import { samePathLessSearchingBlocks } from "./sections/samePathLessSearching";
 import { wrappingUpBlocks } from "./sections/wrappingUp";
+import { playgroundBlocks } from "./sections/playground";
 useVariableStore.getState().initialize(getDefaultValues());
 initializeVariableColors(variableDefinitions);
 
@@ -95,4 +96,5 @@ export const blocks: ReactElement[] = [
     ...aGuessWorthHavingBlocks,
     ...samePathLessSearchingBlocks,
     ...wrappingUpBlocks,
+    ...playgroundBlocks,
 ];

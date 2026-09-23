@@ -224,6 +224,29 @@ export const variableDefinitions: Record<string, VariableDefinition> = {
         color: '#8E90F5',
     },
 
+    // The worked example: a square some columns across and rows up from the nurse
+    guessExampleAcross: {
+        defaultValue: 4,
+        type: 'number',
+        label: 'Columns from the nurse',
+        description: 'Worked example: how many columns across the square is from the nurse',
+        min: 0,
+        max: 12,
+        step: 1,
+        color: '#F7B23B',
+    },
+
+    guessExampleUp: {
+        defaultValue: 3,
+        type: 'number',
+        label: 'Rows from the nurse',
+        description: 'Worked example: how many rows up or down the square is from the nurse',
+        min: 0,
+        max: 8,
+        step: 1,
+        color: '#F7B23B',
+    },
+
     guessWalkPlaying: {
         defaultValue: false,
         type: 'boolean',
@@ -374,6 +397,56 @@ export const variableDefinitions: Record<string, VariableDefinition> = {
         color: '#2563EB',
     },
 
+    // ─────────────────────────────────────────
+    // SECTION — Playground (draw your own floor, run either search)
+    // ─────────────────────────────────────────
+    playgroundWalls: {
+        defaultValue: [6, 19, 32, 45, 58, 71, 48, 61, 74, 87, 100, 113],
+        type: 'array',
+        label: 'Playground walls',
+        description: 'Wall squares on the playground floor as cell indices (row * 13 + col); starts as the hospital floor',
+    },
+
+    playgroundRobot: {
+        defaultValue: [2, 4],
+        type: 'array',
+        label: 'Playground robot position',
+        description: 'The robot square on the playground floor as [col, row]',
+    },
+
+    playgroundNurse: {
+        defaultValue: [11, 4],
+        type: 'array',
+        label: 'Playground nurse position',
+        description: 'The nurse square on the playground floor as [col, row]',
+    },
+
+    playgroundMode: {
+        defaultValue: 'A*',
+        type: 'select',
+        label: 'Playground search',
+        description: 'Which search the playground runs',
+        options: ['A*', 'the blind search'],
+        color: '#62D0AD',
+    },
+
+    playgroundStep: {
+        defaultValue: 117,
+        type: 'number',
+        label: 'Playground squares checked',
+        description: 'How many squares the playground search has checked so far; anything past the end of the run shows the finished search',
+        min: 0,
+        max: 117,
+        step: 1,
+        color: '#62D0AD',
+    },
+
+    playgroundPlaying: {
+        defaultValue: false,
+        type: 'boolean',
+        label: 'Playground playing',
+        description: 'Whether the playground search is advancing by itself',
+    },
 
     // Uncomment and modify these examples for your lesson:
 
